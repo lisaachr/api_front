@@ -50,6 +50,11 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/FormulaireConnexion.vue')
+    },
+    {
+      path: '/inscription',
+      name: 'inscription',
+      component: () => import('@/views/FormulaireInscription.vue'),
     }
   ]
 })
