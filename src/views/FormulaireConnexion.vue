@@ -3,10 +3,10 @@ import {ref} from 'vue';
 import {storeAuthentification} from "@/util/apiStore";
 const connectingUser = ref({
   login: "",
-  password:""
+  plainPassword:""
 });
 function connect():void{
-  storeAuthentification.login(connectingUser.value.login, connectingUser.value.password);
+  storeAuthentification.login(connectingUser.value.login, connectingUser.value.plainPassword);
 }
 </script>
 
@@ -22,7 +22,7 @@ function connect():void{
       </div>
       <div class="group">
         <label>Mot de passe</label>
-        <input type="password" v-model="connectingUser.password" >
+        <input type="password" v-model="connectingUser.plainPassword" >
       </div>
       <button type="submit">
         Connexion
