@@ -45,6 +45,11 @@ const router = createRouter({
       path: '/allPartieConcert',
       name: 'allPartieConcert',
       component: AllPartieConcert
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/FormulaireConnexion.vue')
     }
   ]
 })
