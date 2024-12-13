@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import {ref} from "vue";
 import {apiStore} from "@/util/apiStore";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const newUser = ref({
   login: "",
@@ -14,6 +17,7 @@ const newUser = ref({
 
 function register(): void {
   apiStore.createUser("users", newUser.value)
+  router.push({ name: 'api_front' });
 }
 </script>
 
