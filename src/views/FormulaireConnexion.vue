@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import {ref} from 'vue';
 import {storeAuthentification} from "@/util/apiStore";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 const connectingUser = ref({
   login: "",
   plainPassword:""
 });
 function connect():void{
   storeAuthentification.login(connectingUser.value.login, connectingUser.value.plainPassword);
+  router.push({ name: 'api_front' });
 }
 </script>
 

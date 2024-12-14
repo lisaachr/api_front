@@ -75,8 +75,8 @@ main{
 </style>
 
 <script setup lang="ts">
-import {apiStore, storeAuthentification} from "@/util/apiStore.ts";
+import {storeAuthentification} from "@/util/apiStore.ts";
 function deconnexion(): void {
-  apiStore.logout();
+  storeAuthentification.logout();
 }
 </script>
