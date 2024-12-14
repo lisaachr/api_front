@@ -93,6 +93,10 @@ export const apiStore = {
     return fetch(this.apiUrl+ressource+'/'+id)
       .then(reponsehttp => reponsehttp.json())
   },
+  getByIdReverse(ressource:string, id:number):Promise<any>{
+    return fetch(this.apiUrl+ id + '/' + ressource)
+      .then(reponsehttp => reponsehttp.json())
+  },
   createRessource(
     ressource: string,
     data: never,

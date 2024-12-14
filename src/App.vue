@@ -21,9 +21,7 @@
             <nav aria-label="Global" class="hidden md:block">
               <div class="flex items-center gap-6 text-sm cursor-pointer">
                 <div @click="$router.push({name: 'allEvents'})">Les evenements</div>
-                <div @click="$router.push({name: 'allUsers'})">Les membres</div>
-                <div @click="$router.push({name: 'allScenes'})">Les scenes</div>
-                <div @click="$router.push({name: 'allPartieConcert'})">Les parties de concerts</div>
+                <div v-if="storeAuthentification.estConnecte" @click="$router.push({name: 'myEvents'})">Mes evenements</div>
               </div>
             </nav>
 
