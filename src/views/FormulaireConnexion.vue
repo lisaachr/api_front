@@ -2,6 +2,7 @@
 import {ref} from 'vue';
 import {storeAuthentification} from "@/util/apiStore";
 import { useRouter } from "vue-router";
+import {notify} from "@kyvg/vue3-notification";
 
 const router = useRouter();
 
@@ -10,8 +11,27 @@ const connectingUser = ref({
   plainPassword:""
 });
 function connect():void{
-  storeAuthentification.login(connectingUser.value.login, connectingUser.value.plainPassword);
-  router.push({ name: 'api_front' });
+  storeAuthentification.login(connectingUser.value.login, connectingUser.value.plainPassword).then(res =>{
+    if (res.success) {
+      storeAuthentification.estConnecte = true
+      router.push('api_front')
+      notify({
+        type: "success",
+        title: "Connexion réussie",
+        text: "Vous êtes désormais conncté(e) sur le profil de  " + connectingUser.value.login,
+        duration: 10000
+      })
+    } else {
+      router.push('connexion')
+      notify({
+        type: "error",
+        title: "Connexion échouée",
+        text: res.message || "Login et/ou mot de passe incorrects",
+        duration: 10000
+      })
+      router.push('login')
+    }
+  })
 }
 </script>
 
