@@ -23,7 +23,6 @@ function register(): void {
 
 <template>
   <form @submit.prevent="register">
-    <fieldset>
       <h3>Inscription</h3>
       <div class="group">
         <label>Login</label>
@@ -31,7 +30,7 @@ function register(): void {
       </div>
       <div class="group">
         <label>Password</label>
-        <input v-model="newUser.plainPassword" type="password" required />
+        <input v-model="newUser.plainPassword" type="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,30}$"/>
       </div>
       <div class="group">
         <label>Adresse email</label>
@@ -56,10 +55,9 @@ function register(): void {
       <div>
         <button type="submit">S'inscrire</button>
       </div>
-    </fieldset>
   </form>
 </template>
 
 <style scoped>
-
+  @import "@/components/css/form-style.css";
 </style>
