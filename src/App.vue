@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" v-if="loaded == true">
     <header>
       <h1 @click="$router.push({name: 'api_front'})" >Api front</h1>
 
@@ -17,6 +17,9 @@
       <router-view />
       <Notifications />
     </main>
+  </div>
+  <div v-else class="loading-container">
+    <i class="fa fa-spinner fa-spin"></i> Chargement en cours...
   </div>
 </template>
 
@@ -73,12 +76,37 @@ main{
     width:80%;
   }
 }
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+.loading-container i {
+  margin-right: 10px;
+  font-size: 2rem;
+  color: #007bff;
+}
 </style>
 
 <script setup lang="ts">
 import {storeAuthentification} from "@/util/apiStore.ts";
 import {Notifications, notify} from "@kyvg/vue3-notification";
+import {useRouter} from 'vue-router'
+import {ref} from "vue"
 
+const router = useRouter()
+const loaded = ref(false)
 function deconnexion(): void {
   storeAuthentification.logout().then(() => {
     notify({
@@ -89,4 +117,8 @@ function deconnexion(): void {
     })})
 }
 
+storeAuthentification.refresh()
+  .then(() => {
+    loaded.value = true
+  })
 </script>
