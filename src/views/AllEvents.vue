@@ -15,7 +15,6 @@ apiStore.getAll('evenement_musicals')
 </script>
 
 <template>
-  <h1 class="title">Liste des événements musicaux.</h1>
   <div v-for="evenement in evenementsMusicals" :key="evenement.id">
     <BoiteEvenementMusical :evenement="evenement"/>
   </div>
