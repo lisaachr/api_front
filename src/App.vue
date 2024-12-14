@@ -15,6 +15,7 @@
     </header>
     <main>
       <router-view />
+      <Notifications />
     </main>
   </div>
 </template>
@@ -76,7 +77,16 @@ main{
 
 <script setup lang="ts">
 import {storeAuthentification} from "@/util/apiStore.ts";
+import {Notifications, notify} from "@kyvg/vue3-notification";
+
 function deconnexion(): void {
-  storeAuthentification.logout();
+  storeAuthentification.logout().then(() => {
+    notify({
+      title: 'Déconnexion réussie',
+      text: 'Vous êtes désormais déconnecté.',
+      duration: 10000,
+      type: 'success'
+    })})
 }
+
 </script>

@@ -1,21 +1,21 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import API from '@/views/Main.vue'
-import User from '@/views/AllUsers.vue'
+import AllUsers from '@/views/AllUsers.vue'
 import AllEvents from '@/views/AllEvents.vue'
 import AllScenes from '@/views/AllScenes.vue'
 import AllPartieConcert from '@/views/AllPartiesConcerts.vue'
+import SingleEvent from '@/views/SingleEvent.vue'
+import SingleUser from '@/views/SingleUser.vue'
+import SinglePartieConcert from '@/views/SinglePartieConcert.vue'
+import SingleScene from '@/views/SingleScene.vue'
 
 const router = createRouter({
-  //Cette ligne indique qu'on utilise la gestion html5 des urls
-  //l'argument donné à la fonction createWebHistory sert de base pour la réécriture des routes
-  //on utilise donc import.meta.env.BASE_URL qui correspond à la valeur donné à base dans le fichier vite.config.ts
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
       component: API,
-      redirect: { name: 'api_front' },
-      children: []
+      redirect: { name: 'api_front' }
     },
     {
       path: '/api_front',
@@ -24,8 +24,28 @@ const router = createRouter({
     },
     {
       path: '/users',
-      name:'allUsers',
-      component: User
+      name: 'allUsers',
+      component: AllUsers
+    },
+    {
+      path: '/users/:id',
+      name: 'singleUser',
+      component: SingleUser
+    },
+    {
+      path: '/evenement/:id',
+      name: 'singleEvent',
+      component: SingleEvent
+    },
+    {
+      path: '/partieconcert/:id',
+      name: 'singlePartieConcert',
+      component: SinglePartieConcert
+    },
+    {
+      path: '/scene/:id',
+      name: 'singleScene',
+      component: SingleScene
     },
     {
       path: '/:pathMatch(.*)*',
@@ -54,7 +74,7 @@ const router = createRouter({
     {
       path: '/inscription',
       name: 'inscription',
-      component: () => import('@/views/FormulaireInscription.vue'),
+      component: () => import('@/views/FormulaireInscription.vue')
     }
   ]
 })

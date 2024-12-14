@@ -2,6 +2,7 @@
 import {ref} from "vue";
 import {apiStore} from "@/util/apiStore";
 import { useRouter } from "vue-router";
+import {notify} from "@kyvg/vue3-notification";
 
 const router = useRouter();
 
@@ -16,8 +17,25 @@ const newUser = ref({
 });
 
 function register(): void {
-  apiStore.createUser("users", newUser.value)
-  router.push({ name: 'api_front' });
+  apiStore.createUser("users", newUser.value).then((res) => {
+    if (res.success) {
+      notify({
+        type: "success",
+        title: "Inscription réussie",
+        text: "Bienvenue! Vous êtes maintenant inscrit avec le compte de " + newUser.value.prenom + " " + newUser.value.nom,
+        duration: 10000
+      });
+      router.push({ name: 'api_front' });
+    }
+    else{
+      notify({
+        type: "error",
+        title: "Erreur d'inscription",
+        text: "Vérifiez que le mot de passe soit correct ou que les informations rentrées soient correctes",
+        duration: 10000
+      });
+    }
+  })
 }
 </script>
 
