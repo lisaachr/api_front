@@ -19,5 +19,5 @@ export default defineConfig({
     host: true,
     port: 5173
   },
-  base: "api_front/dist"
+  base: "/api_front/dist"
 })

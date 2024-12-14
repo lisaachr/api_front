@@ -8,9 +8,9 @@
         <div @click="$router.push({name: 'allUsers'})" >Les membres</div>
         <div @click="$router.push({name: 'allScenes'})" >Les scenes</div>
         <div @click="$router.push({name: 'allPartieConcert'})" >Les parties de concerts</div>
-<!--        <div v-if="!storeAuthentification.estConnecte" @click="$router.push({name: 'inscription'})" >S'inscrire</div>-->
-<!--        <div v-if="!storeAuthentification.estConnecte" @click="$router.push({name: 'connexion'})" >Se connecter</div>-->
-<!--        <div v-if="storeAuthentification.estConnecte" @click="deconnexion" >Se déconnecter</div>-->
+        <div v-if="!storeAuthentification.estConnecte" @click="$router.push({name: 'inscription'})" >S'inscrire</div>
+        <div v-if="!storeAuthentification.estConnecte" @click="$router.push({name: 'login'})" >Se connecter</div>
+        <div v-if="storeAuthentification.estConnecte" @click="deconnexion" >Se déconnecter</div>
       </nav>
     </header>
     <main>
@@ -75,4 +75,8 @@ main{
 </style>
 
 <script setup lang="ts">
+import {storeAuthentification} from "@/util/apiStore.ts";
+function deconnexion(): void {
+  storeAuthentification.logout();
+}
 </script>
