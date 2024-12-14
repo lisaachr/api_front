@@ -1,10 +1,10 @@
 <template>
   <div id="wrapper">
-    <header class="bg-white">
+    <header class="bg-white sticky top-0 z-50">
       <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
           <div class="flex-1 md:flex md:items-center md:gap-12">
-            <a class="block text-teal-600" @click="$router.push({name: 'api_front'})">
+            <a class="block text-teal-600 cursor-pointer" @click="$router.push({name: 'api_front'})">
               <span class="sr-only">Home</span>
               <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 14 14">
                 <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
