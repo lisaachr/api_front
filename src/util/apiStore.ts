@@ -40,8 +40,8 @@ export const storeAuthentification = reactive({
       if (!reponsehttp.ok) {
         return reponsehttp.json()
           .then(reponseJSON => {
-            // this.utilisateurConnecte = reponseJSON
-            // this.estConnecte = true
+            this.utilisateurConnecte = reponseJSON
+            this.estConnecte = true
             return {success: false, error: reponseJSON.message}
           })
       } else {
