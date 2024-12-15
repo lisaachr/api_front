@@ -12,8 +12,17 @@ const newUser = ref({
   email: "",
   nom: "",
   prenom: "",
-  villeHabitation: "",
+  villeHabitation: null,
   dateDeNaissance: "",
+});
+
+const villes = ref([]);
+
+apiStore.getAll("villes").then((response) => {
+  villes.value = response.member.map((ville: any) => ({
+    id: ville.id,
+    nom: ville.nom,
+  }));
 });
 
 function register(): void {
@@ -64,7 +73,11 @@ function register(): void {
       </div>
       <div class="group">
         <label>Ville</label>
-        <input v-model="newUser.villeHabitation" type="text" required />
+        <select v-model="newUser.villeHabitation" required>
+          <option v-for="ville in villes" :key="ville.id" :value="ville.id">
+            {{ ville.nom }}
+          </option>
+        </select>
       </div>
       <div class="group">
         <label>Date de naissance</label>
