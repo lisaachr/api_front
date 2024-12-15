@@ -1,9 +1,7 @@
-
-
 <template>
   <div id="wrapper" v-if="loaded == true">
     <header>
-      <h1 @click="$router.push({name: 'api_front'})" >Api front</h1>
+      <h1 @click="$router.push({name: 'allEvents'})" >Api front</h1>
 
       <nav>
         <div @click="$router.push({name: 'allEvents'})">Les evenements</div>
