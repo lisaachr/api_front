@@ -13,7 +13,7 @@
       <!-- Contenu dynamique en fonction de la page -->
       <div class="h-full flex items-center justify-center px-6">
         <!-- Page principale de présentation -->
-        <div v-if="currentPage === 0" class="text-center">
+        <div v-if="currentPage === 0" class="text-center cursor-pointer" @click="$router.push({name: 'singleEvent', params: {id : evenement.id}})">
           <h2 class="text-xl font-bold">{{ evenement.nom }}</h2>
           <img
             v-if="evenement.photo"
