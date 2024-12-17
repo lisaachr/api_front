@@ -71,14 +71,14 @@ function register(): void {
         <label>Prenom</label>
         <input v-model="newUser.prenom" type="text" required />
       </div>
-      <div class="group">
-        <label>Ville</label>
-        <select v-model="newUser.villeHabitation" required>
-          <option v-for="ville in villes" :key="ville.id" :value="ville.id">
-            {{ ville.nom }}
-          </option>
-        </select>
-      </div>
+<!--      <div class="group">-->
+<!--        <label>Ville</label>-->
+<!--        <select v-model="newUser.villeHabitation" required>-->
+<!--          <option v-for="ville in villes" :key="ville.id" :value="ville.id">-->
+<!--            {{ ville.nom }}-->
+<!--          </option>-->
+<!--        </select>-->
+<!--      </div>-->
       <div class="group">
         <label>Date de naissance</label>
         <input v-model="newUser.dateDeNaissance" type="date" required />
