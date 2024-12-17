@@ -57,6 +57,11 @@ const router = createRouter({
       component: AllEvents
     },
     {
+      path: '/myEvents',
+      name: 'myEvents',
+      component: () => import('@/views/MyEvents.vue')
+    },
+    {
       path: '/allScenes',
       name: 'allScenes',
       component: AllScenes
