@@ -31,7 +31,6 @@ apiStore.getById('evenement_musicals', id)
 defineProps({
   genres: {
     type: String,
-    required: true,
   },
 });
 
@@ -41,7 +40,7 @@ const genreImageMap: Record<string, string> = {
   jazz: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Jazz%20Band.jpg",
   classique: "https://example.com/classique-image.jpg",
   electro: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/electro.jpg",
-  rap: "https://example.com/rap-image.jpg",
+  rap: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/%f0%9f%8e%a4.jpg",
   reggae: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/reggae-songs-graphic-art-silhouette.webp",
   blues: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/The-Blues-1024x865.jpg",
   metal: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg",
@@ -69,7 +68,7 @@ const convertirGenre = (genre: any) => {
     'hip hop': 'hiphop',  // Correction de l'espace
   };
 
-  return correspondances[genreNormalise] || '';
+  return correspondances[genreNormalise];
 };
 
 // Récupération du genre musical de l'événement (le premier genre si plusieurs)
@@ -81,54 +80,9 @@ const genreMusicalPremier = computed(() => {
 });
 
 // Source d'image pour l'événement
-const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] || 'default-image-url.jpg');
+const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] != '' ?  genreImageMap[genreMusicalPremier.value] : 'https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg');
 </script>
 
-
-<!--<template>-->
-<!--  <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">-->
-<!--    <div class="card flex-1 flex items-center justify-center">-->
-<!--      <div class="card-img"><div class="img"></div></div>-->
-<!--      <div class="card-title">-->
-<!--        <h1 class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left">-->
-<!--          Événement Musical: <span class="text-primary">{{ evenement.nom }}</span>-->
-<!--        </h1>-->
-<!--      </div>-->
-<!--      <div class="card-subtitle">-->
-<!--        <p class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left">-->
-<!--          {{ evenement.adresse }}-->
-<!--        </p>-->
-<!--      </div>-->
-<!--      <div class="card-subtitle">-->
-<!--        <p class="text-surface-700 dark:text-surface-200 leading-normal text-center lg:text-left">-->
-<!--          Du {{ evenement.dateDeDebut }} au {{ evenement.dateDeFin }}-->
-<!--        </p>-->
-<!--      </div>-->
-<!--&lt;!&ndash;      <div class="card-price"><span>€</span>{{evenement.prix}}</div>&ndash;&gt;-->
-<!--&lt;!&ndash;      <div class="card-subtitle">&ndash;&gt;-->
-<!--&lt;!&ndash;        <div class="card-price"><span>€</span>{{evenement.prix}}</div>&ndash;&gt;-->
-<!--&lt;!&ndash;        <button class="card-btn">&ndash;&gt;-->
-<!--&lt;!&ndash;          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z"></path><path d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z"></path></svg>&ndash;&gt;-->
-<!--&lt;!&ndash;        </button>&ndash;&gt;-->
-<!--&lt;!&ndash;      </div>&ndash;&gt;-->
-<!--      <hr class="card-divider">-->
-<!--      <div class="card-footer">-->
-<!--        <div class="card-price"><span>€</span>{{evenement.prix}}</div>-->
-<!--        <button class="card-btn">-->
-<!--          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z"></path><path d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z"></path></svg>-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--    <div class="flex-1 overflow-hidden">-->
-<!--      <img-->
-<!--        :src="imageSrc"-->
-<!--        alt="Image de l'événement"-->
-<!--        class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"-->
-<!--      />-->
-<!--    </div>-->
-
-<!--  </div>-->
-<!--</template>-->
 <template>
   <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">
     <div class="card flex-1 flex items-center justify-center">
@@ -161,10 +115,19 @@ const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] || 'def
     </div>
     <div class="flex-1 overflow-hidden p-2">
       <img
+        v-if="imageSrc && imageSrc !== ''"
         :src="imageSrc"
         alt="Image de l'événement"
         class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"
       />
+      <!-- Si imageSrc est null ou vide, afficher l'image par défaut -->
+      <img
+        v-else
+        src="https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg"
+        alt="Image par défaut de l'événement"
+        class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"
+      />
+
     </div>
   </div>
 </template>
