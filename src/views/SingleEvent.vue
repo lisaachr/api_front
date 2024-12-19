@@ -1,61 +1,276 @@
 <script setup lang="ts">
-import { useRoute } from 'vue-router'
-import { ref } from 'vue'
-import type { EvenementMusical } from "@/types"
-import { apiStore } from "@/util/apiStore";
+import {useRoute} from 'vue-router';
+import {ref, computed} from 'vue';
+import type {EvenementMusical} from "@/types";
+import {apiStore} from "@/util/apiStore";
 
-const route = useRoute()
-const id = route.params.id
+const route = useRoute();
+const id = route.params.id;
 
+// Initialisation de l'événement
 const evenement = ref<EvenementMusical>({
   id: Number(route.params.id),
   nom: "Chargement...",
   dateDeDebut: "Chargement...",
   dateDeFin: "Chargement...",
   prix: 0,
-  adresse: "Chargement..."
-})
+  adresse: "Chargement...",
+  genreMusical: []
+});
 
+// Récupération des données de l'événement
 apiStore.getById('evenement_musicals', id)
   .then(res => {
-    evenement.value = res
-    console.log(evenement.value)
+    evenement.value = res;
   })
+  .catch(err => {
+    console.error('Erreur lors de la récupération de l\'événement', err);
+  });
+
+// Définition des props
+defineProps({
+  genres: {
+    type: String,
+    required: true,
+  },
+});
+
+// Mapping entre les genres et leurs images associées
+const genreImageMap: Record<string, string> = {
+  rock: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/nathanpowell%20rock.jpg",
+  jazz: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Jazz%20Band.jpg",
+  classique: "https://example.com/classique-image.jpg",
+  electro: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/electro.jpg",
+  rap: "https://example.com/rap-image.jpg",
+  reggae: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/reggae-songs-graphic-art-silhouette.webp",
+  blues: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/The-Blues-1024x865.jpg",
+  metal: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg",
+  hipHop: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/HIP-HOP-1.jpg",
+};
+
+// Fonction pour convertir le genre musical de la base de données
+const convertirGenre = (genre: any) => {
+  if (typeof genre !== 'string') {
+    console.error('Le genre musical n\'est pas une chaîne de caractères', genre);
+    return '';  // Retourne une chaîne vide en cas de problème
+  }
+
+  const genreNormalise = genre.toLowerCase().replace(/\s+/g, '').replace('poprock', 'pop rock');
+  const correspondances = {
+    rock: 'rock',
+    metal: 'metal',
+    rap: 'rap',
+    'pop rock': 'pop rock',
+    jazz: 'jazz',
+    blues: 'blues',
+    classique: 'classique',
+    electro: 'electro',
+    reggae: 'reggae',
+    'hip hop': 'hiphop',  // Correction de l'espace
+  };
+
+  return correspondances[genreNormalise] || '';
+};
+
+// Récupération du genre musical de l'événement (le premier genre si plusieurs)
+const genreMusicalPremier = computed(() => {
+  if (evenement.value.genreMusical && evenement.value.genreMusical.length > 0) {
+    return convertirGenre(evenement.value.genreMusical[0].nom);
+  }
+  return '';
+});
+
+// Source d'image pour l'événement
+const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] || 'default-image-url.jpg');
 </script>
 
+
+<!--<template>-->
+<!--  <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">-->
+<!--    <div class="card flex-1 flex items-center justify-center">-->
+<!--      <div class="card-img"><div class="img"></div></div>-->
+<!--      <div class="card-title">-->
+<!--        <h1 class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left">-->
+<!--          Événement Musical: <span class="text-primary">{{ evenement.nom }}</span>-->
+<!--        </h1>-->
+<!--      </div>-->
+<!--      <div class="card-subtitle">-->
+<!--        <p class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left">-->
+<!--          {{ evenement.adresse }}-->
+<!--        </p>-->
+<!--      </div>-->
+<!--      <div class="card-subtitle">-->
+<!--        <p class="text-surface-700 dark:text-surface-200 leading-normal text-center lg:text-left">-->
+<!--          Du {{ evenement.dateDeDebut }} au {{ evenement.dateDeFin }}-->
+<!--        </p>-->
+<!--      </div>-->
+<!--&lt;!&ndash;      <div class="card-price"><span>€</span>{{evenement.prix}}</div>&ndash;&gt;-->
+<!--&lt;!&ndash;      <div class="card-subtitle">&ndash;&gt;-->
+<!--&lt;!&ndash;        <div class="card-price"><span>€</span>{{evenement.prix}}</div>&ndash;&gt;-->
+<!--&lt;!&ndash;        <button class="card-btn">&ndash;&gt;-->
+<!--&lt;!&ndash;          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z"></path><path d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z"></path></svg>&ndash;&gt;-->
+<!--&lt;!&ndash;        </button>&ndash;&gt;-->
+<!--&lt;!&ndash;      </div>&ndash;&gt;-->
+<!--      <hr class="card-divider">-->
+<!--      <div class="card-footer">-->
+<!--        <div class="card-price"><span>€</span>{{evenement.prix}}</div>-->
+<!--        <button class="card-btn">-->
+<!--          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="m397.78 316h-205.13a15 15 0 0 1 -14.65-11.67l-34.54-150.48a15 15 0 0 1 14.62-18.36h274.27a15 15 0 0 1 14.65 18.36l-34.6 150.48a15 15 0 0 1 -14.62 11.67zm-193.19-30h181.25l27.67-120.48h-236.6z"></path><path d="m222 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m368.42 450a57.48 57.48 0 1 1 57.48-57.48 57.54 57.54 0 0 1 -57.48 57.48zm0-84.95a27.48 27.48 0 1 0 27.48 27.47 27.5 27.5 0 0 0 -27.48-27.47z"></path><path d="m158.08 165.49a15 15 0 0 1 -14.23-10.26l-25.71-77.23h-47.44a15 15 0 1 1 0-30h58.3a15 15 0 0 1 14.23 10.26l29.13 87.49a15 15 0 0 1 -14.23 19.74z"></path></svg>-->
+<!--        </button>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div class="flex-1 overflow-hidden">-->
+<!--      <img-->
+<!--        :src="imageSrc"-->
+<!--        alt="Image de l'événement"-->
+<!--        class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"-->
+<!--      />-->
+<!--    </div>-->
+
+<!--  </div>-->
+<!--</template>-->
 <template>
-  <div class="contentBox">
-    <div class="top">
-      Événement: {{ evenement.nom }}
+  <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">
+    <div class="card flex-1 flex items-center justify-center">
+      <div class="card-img">
+        <div class="img"></div>
+      </div>
+      <div class="card-title">
+        <h1
+          class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left">
+         <span class="text-primary">{{ evenement.nom }}</span>
+        </h1>
+      </div>
+      <div class="card-subtitle">
+        <p class="text-surface-700 dark:text-surface-200 leading-normal mb-8 text-center lg:text-left">
+          {{ evenement.adresse }}
+        </p>
+      </div>
+      <div class="card-subtitle">
+        <p class="text-surface-700 dark:text-surface-200 leading-normal text-center lg:text-left">
+          Du {{ evenement.dateDeDebut }} au {{ evenement.dateDeFin }}
+        </p>
+      </div>
+      <hr class="card-divider">
+      <div class="card-footer flex flex-[auto_1_1] space-x-2">
+        <div class="card-price"><span>€</span>{{ evenement.prix }}</div>
+        <button class="card-btn">
+          S'inscire
+        </button>
+      </div>
     </div>
-    <div class="content">
-      <div class="input-group">
-        <label>ID :</label>
-        <span>{{ evenement.id }}</span>
-      </div>
-      <div class="input-group">
-        <label>Nom :</label>
-        <span>{{ evenement.nom }}</span>
-      </div>
-      <div class="input-group">
-        <label>Date de début :</label>
-        <span>{{ evenement.dateDeDebut }}</span>
-      </div>
-      <div class="input-group">
-        <label>Date de fin :</label>
-        <span>{{ evenement.dateDeFin }}</span>
-      </div>
-      <div class="input-group">
-        <label>Prix :</label>
-        <span>{{ evenement.prix }} €</span>
-      </div>
-      <div class="input-group">
-        <label>Adresse :</label>
-        <span>{{ evenement.adresse }}</span>
-      </div>
+    <div class="flex-1 overflow-hidden p-2">
+      <img
+        :src="imageSrc"
+        alt="Image de l'événement"
+        class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"
+      />
     </div>
   </div>
 </template>
 
 <style scoped>
+/* Card container */
+.card {
+  --font-color: #323232;
+  --font-color-sub: #666;
+  --bg-color: #fff;
+  --main-color: #323232;
+  --main-focus: #2d8cf0;
+  width: 95vw;
+  height: 50vh;
+  background: var(--bg-color);
+  border: 2px solid var(--main-color);
+  box-shadow: 4px 4px var(--main-color);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 2rem;
+  margin: 1rem;
+  gap: 10px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  box-sizing: border-box;
+}
+
+.card-img {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.card-img .img {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #228b22;
+  background-image: linear-gradient(to top, transparent 10px, rgba(0,0,0,0.3) 10px, rgba(0,0,0,0.3) 13px, transparent 13px);
+  border: 2px solid black;
+}
+
+.card-title {
+  font-size: 20px;
+  font-weight: 500;
+  text-align: center;
+  color: var(--font-color);
+}
+
+.card-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--font-color-sub);
+}
+
+.card-price {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--font-color);
+}
+
+.card-price span {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--font-color-sub);
+}
+
+.card-btn {
+  height: 35px;
+  background: var(--bg-color);
+  border: 2px solid var(--main-color);
+  border-radius: 5px;
+  padding: 0 15px;
+  transition: all 0.3s;
+}
+
+.card-btn svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--main-color);
+  transition: all 0.3s;
+}
+
+.card-btn:hover {
+  border: 2px solid var(--main-focus);
+}
+
+.card-btn:hover svg {
+  fill: var(--main-focus);
+}
+
+.card-btn:active {
+  transform: translateY(3px);
+}
+
+/* Responsive layout adjustments */
+@media (min-width: 1024px) {
+  .card {
+    width: 100%;
+  }
+
+  .card-img .img {
+    width: 120px;
+    height: 120px;
+  }
+}
 </style>
