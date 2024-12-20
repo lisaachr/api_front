@@ -231,39 +231,6 @@ export const apiStore = {
           })
       }
     })
-  },
-  desinscrireEvenement(ressource: string, eventId: number, userId: number, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    return fetch(this.apiUrl + ressource + '/' + eventId, {
-      method: "PATCH",
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        participants: ["/api_rest/public/api/users/" + userId],
-        action: "remove" // Indiquer que c'est une action de suppression
-      }),
-      credentials: 'include',
-    }).then(reponsehttp => {
-      if (reponsehttp.ok) {
-        return reponsehttp.json().then(() => {
-          return { success: true };
-        });
-      } else if (reponsehttp.status === 401 && refreshAllowed) {
-        return storeAuthentification.refresh().then(
-          refreshResponse => {
-            if (refreshResponse.success) {
-              return this.desinscrireEvenement(ressource, eventId, userId, false);
-            } else {
-              return { success: false, error: "unauthorized, failure to refresh token." };
-            }
-          }
-        );
-      } else {
-        return reponsehttp.json().then(reponseJSON => {
-          return { success: false, error: reponseJSON.message };
-        });
-      }
-    });
   }
 
 }
