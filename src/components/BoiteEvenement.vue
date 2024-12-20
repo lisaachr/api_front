@@ -99,6 +99,7 @@ const prevPage = () => {
 
 // Méthode pour inscrire l'utilisateur à un événement
 function inscrireUtilisateur(evenementId: number) {
+  console.log("event:",[evenementId])
   if (!storeAuthentification.estConnecte) {
     notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire a un évènement.' });
     return;
@@ -108,7 +109,7 @@ function inscrireUtilisateur(evenementId: number) {
 
   // Mettre à jour l'utilisateur avec l'événement
   apiStore.updateUser('users', userId, {
-    evenements: [evenementId],
+    evenementMusicals: ["/api_rest/public/api/evenement_musicals/" + evenementId]
   })
     .then(userUpdateResponse => {
       if (!userUpdateResponse.success) {
@@ -117,7 +118,7 @@ function inscrireUtilisateur(evenementId: number) {
 
       // Mettre à jour l'événement avec l'utilisateur
       return apiStore.updateEvent('evenement_musicals', evenementId, {
-        utilisateurs: [userId]
+        participants: ["/api_rest/public/api/users/" + userId]
       });
     })
     .then(eventUpdateResponse => {
