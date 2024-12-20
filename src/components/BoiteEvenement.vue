@@ -50,6 +50,7 @@
           </p>
           <button
             class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            @click="inscrireUtilisateur(evenement.id)"
           >
             S'inscrire
           </button>
@@ -71,6 +72,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { EvenementMusical } from "@/types";
+import { apiStore, storeAuthentification} from "@/util/apiStore.ts";
+import {notify} from "@kyvg/vue3-notification";
 
 // Définition des props
 defineProps<{
@@ -93,6 +96,42 @@ const prevPage = () => {
     currentPage.value--;
   }
 };
+
+// Méthode pour inscrire l'utilisateur à un événement
+function inscrireUtilisateur(evenementId: number) {
+  if (!storeAuthentification.estConnecte) {
+    notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire a un évènement.' });
+    return;
+  }
+
+  const userId = storeAuthentification.utilisateurConnecte.id;
+
+  // Mettre à jour l'utilisateur avec l'événement
+  apiStore.updateUser('users', userId, {
+    evenements: [evenementId],
+  })
+    .then(userUpdateResponse => {
+      if (!userUpdateResponse.success) {
+        throw new Error(userUpdateResponse.error || "Erreur lors de la mise à jour de l'utilisateur.");
+      }
+
+      // Mettre à jour l'événement avec l'utilisateur
+      return apiStore.updateEvent('evenement_musicals', evenementId, {
+        utilisateurs: [userId]
+      });
+    })
+    .then(eventUpdateResponse => {
+      if (!eventUpdateResponse.success) {
+        throw new Error(eventUpdateResponse.error || "Erreur lors de la mise à jour de l'événement.");
+      }
+
+      notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+    })
+    .catch(error => {
+      console.error("Erreur :", error);
+      notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+    });
+}
 </script>
 
 <style scoped>
