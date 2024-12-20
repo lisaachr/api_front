@@ -162,7 +162,6 @@ export const apiStore = {
     })
   },
   updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    console.log("Sending data:", JSON.stringify(data))
     return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
@@ -173,9 +172,12 @@ export const apiStore = {
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
         return reponsehttp.json()
-          .then(() => {
-            return { success: true }
-          })
+          .then(response => {
+            if (data.evenementMusicals) {
+              response.evenementMusicals = [...response.evenementMusicals, ...data.evenementMusicals];
+            }
+            return { success: true, data: response }
+          });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
@@ -205,9 +207,13 @@ export const apiStore = {
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
         return reponsehttp.json()
-          .then(() => {
-            return { success: true }
-          })
+          .then(response => {
+            // Si nous ajoutons des participants, nous devons les ajouter à la liste existante
+            if (data.participants) {
+              response.participants = [...response.participants, ...data.participants];
+            }
+            return { success: true, data: response }
+          });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
@@ -225,6 +231,39 @@ export const apiStore = {
           })
       }
     })
+  },
+  desinscrireEvenement(ressource: string, eventId: number, userId: number, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + ressource + '/' + eventId, {
+      method: "PATCH",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        participants: ["/api_rest/public/api/users/" + userId],
+        action: "remove" // Indiquer que c'est une action de suppression
+      }),
+      credentials: 'include',
+    }).then(reponsehttp => {
+      if (reponsehttp.ok) {
+        return reponsehttp.json().then(() => {
+          return { success: true };
+        });
+      } else if (reponsehttp.status === 401 && refreshAllowed) {
+        return storeAuthentification.refresh().then(
+          refreshResponse => {
+            if (refreshResponse.success) {
+              return this.desinscrireEvenement(ressource, eventId, userId, false);
+            } else {
+              return { success: false, error: "unauthorized, failure to refresh token." };
+            }
+          }
+        );
+      } else {
+        return reponsehttp.json().then(reponseJSON => {
+          return { success: false, error: reponseJSON.message };
+        });
+      }
+    });
   }
 
 }

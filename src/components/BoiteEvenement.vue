@@ -50,9 +50,9 @@
           </p>
           <button
             class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
-            @click="inscrireUtilisateur(evenement.id)"
+            @click="estInscrit ? desinscrireUtilisateur(evenement.id) : inscrireUtilisateur(evenement.id)"
           >
-            S'inscrire
+            {{ estInscrit ? 'Se désinscrire' : 'S\'inscrire' }}
           </button>
         </div>
       </div>
@@ -76,7 +76,7 @@ import { apiStore, storeAuthentification} from "@/util/apiStore.ts";
 import {notify} from "@kyvg/vue3-notification";
 
 // Définition des props
-defineProps<{
+const props = defineProps<{
   evenement: EvenementMusical;
 }>();
 
@@ -97,36 +97,78 @@ const prevPage = () => {
   }
 };
 
+const estInscrit = ref(false);
+
+// Dans setup, vérifier si l'utilisateur est déjà inscrit
+if (storeAuthentification.estConnecte) {
+  const userId = storeAuthentification.utilisateurConnecte.id;
+  apiStore.getById('users', userId).then(user => {
+    estInscrit.value = user.evenementMusicals.some(event => event.id === props.evenement.id);
+  });
+}
+
 // Méthode pour inscrire l'utilisateur à un événement
 function inscrireUtilisateur(evenementId: number) {
-  console.log("event:",[evenementId])
   if (!storeAuthentification.estConnecte) {
-    notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire a un évènement.' });
+    notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire à un évènement.' });
     return;
   }
 
   const userId = storeAuthentification.utilisateurConnecte.id;
 
-  // Mettre à jour l'utilisateur avec l'événement
-  apiStore.updateUser('users', userId, {
-    evenementMusicals: ["/api_rest/public/api/evenement_musicals/" + evenementId]
-  })
-    .then(userUpdateResponse => {
-      if (!userUpdateResponse.success) {
-        throw new Error(userUpdateResponse.error || "Erreur lors de la mise à jour de l'utilisateur.");
-      }
+  // Récupérer les événements existants de l'utilisateur
+  apiStore.getById('users', userId).then(user => {
+    const existingEvents = user.evenementMusicals.map(event => event.id);
 
-      // Mettre à jour l'événement avec l'utilisateur
-      return apiStore.updateEvent('evenement_musicals', evenementId, {
-        participants: ["/api_rest/public/api/users/" + userId]
-      });
-    })
+    if (!existingEvents.includes(evenementId)) {
+      apiStore.updateUser('users', userId, {
+        evenementMusicals: [...existingEvents.map(id => '/api_rest/public/api/evenement_musicals/' + id), '/api_rest/public/api/evenement_musicals/' + evenementId]
+      })
+        .then(userUpdateResponse => {
+          if (!userUpdateResponse.success) {
+            throw new Error(userUpdateResponse.error || "Erreur lors de la mise à jour de l'utilisateur.");
+          }
+          // Mettre à jour l'événement avec l'utilisateur
+          return apiStore.getById('evenement_musicals', evenementId).then(event => {
+            const existingParticipants = event.participants.map(participant => participant.id);
+            if (!existingParticipants.includes(userId)) {
+              return apiStore.updateEvent('evenement_musicals', evenementId, {
+                participants: [...existingParticipants.map(id => '/api_rest/public/api/users/' + id), '/api_rest/public/api/users/' + userId]
+              });
+            } else {
+              return { success: true };
+            }
+          });
+        })
+        .then(eventUpdateResponse => {
+          if (!eventUpdateResponse.success) {
+            throw new Error(eventUpdateResponse.error || "Erreur lors de la mise à jour de l'événement.");
+          }
+          estInscrit.value = true;
+          notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+        })
+        .catch(error => {
+          console.error("Erreur :", error);
+          notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+        });
+    } else {
+      notify({ type: 'warning', text: 'Vous êtes déjà inscrit à cet événement.' });
+    }
+  });
+}
+
+function desinscrireUtilisateur(evenementId: number) {
+  const userId = storeAuthentification.utilisateurConnecte.id;
+
+  apiStore.desinscrireEvenement('evenement_musicals', evenementId, userId)
     .then(eventUpdateResponse => {
       if (!eventUpdateResponse.success) {
-        throw new Error(eventUpdateResponse.error || "Erreur lors de la mise à jour de l'événement.");
+        throw new Error(eventUpdateResponse.error || "Erreur lors de la désinscription de l'événement.");
       }
 
-      notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+      // Mettre à jour l'état d'inscription de l'utilisateur
+      estInscrit.value = false;
+      notify({ type: 'success', text: 'Désinscription réussie de l\'événement !' });
     })
     .catch(error => {
       console.error("Erreur :", error);
