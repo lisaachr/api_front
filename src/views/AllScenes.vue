@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import BoiteScene from "@/components/BoiteScene.vue" // Composant pour afficher les scènes
+import BoiteScene from "@/components/BoiteScene.vue"
 import { apiStore } from '@/util/apiStore.ts'
 
 const scenes = ref([])

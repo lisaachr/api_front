@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {ref} from "vue"
-import BoiteEvenementMusical from "@/components/BoiteEvenement.vue" // Composant pour afficher les événements musicaux
+import BoiteEvenementMusical from "@/components/BoiteEvenement.vue"
 import {storeAuthentification} from "@/util/apiStore.ts";
 import {apiStore} from '@/util/apiStore.ts'
 

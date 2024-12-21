@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import BoiteEvenementMusical from "@/components/BoiteEvenement.vue"; // Composant pour afficher les événements musicaux
+import BoiteEvenementMusical from "@/components/BoiteEvenement.vue";
 import { apiStore } from "@/util/apiStore.ts";
 
 const evenementsMusicals = ref([]);
@@ -18,12 +18,8 @@ apiStore.getAll("evenement_musicals").then((res) => {
       :key="evenement.id"
       class="dark:bg-gray-800 rounded-lg p-4"
     >
-      <!-- Affiche un événement avec le composant dédié -->
       <BoiteEvenementMusical :evenement="evenement" />
     </div>
   </div>
 </template>
 
-<style scoped>
-/* Ajoutez vos styles spécifiques ici si nécessaire */
-</style>

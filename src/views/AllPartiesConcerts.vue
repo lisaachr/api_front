@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import BoitePartieConcert from "@/components/BoitePartieConcert.vue" // Composant pour afficher les parties de concert
+import BoitePartieConcert from "@/components/BoitePartieConcert.vue"
 import { apiStore } from '@/util/apiStore.ts'
 
 const partieConcert = ref([])

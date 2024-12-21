@@ -160,6 +160,38 @@ export const apiStore = {
           })
       }
     })
-  }
+  },
+  updateUser(ressource: string, data: any): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + ressource + '/' + data.id, {
+      method: "PATCH",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    }).then(reponsehttp => {
+      if (reponsehttp.ok) {
+        return reponsehttp.json()
+          .then(() => {
+            return { success: true };
+          });
+      } else if (reponsehttp.status === 401) {
+        return storeAuthentification.refresh().then(
+          refreshResponse => {
+            if (refreshResponse.success) {
+              return this.updateUser(ressource, data);
+            } else {
+              return { success: false, error: "unauthorized, failure to refresh token." };
+            }
+          }
+        );
+      } else {
+        return reponsehttp.json()
+          .then(reponseJSON => {
+            return { success: false, error: reponseJSON.message };
+          });
+      }
+    });
+  },
 
 }

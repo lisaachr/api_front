@@ -80,6 +80,11 @@ const router = createRouter({
       path: '/inscription',
       name: 'inscription',
       component: () => import('@/views/FormulaireInscription.vue')
+    },
+    {
+      path: '/updateProfil',
+      name: 'updateProfil',
+      component: () => import('@/views/FormulaireModifUser.vue')
     }
   ]
 })

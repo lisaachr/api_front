@@ -72,16 +72,13 @@
 import { ref } from "vue";
 import type { EvenementMusical } from "@/types";
 
-// Définition des props
 defineProps<{
   evenement: EvenementMusical;
 }>();
 
-// Variables réactives pour la gestion des pages
 const currentPage = ref(0);
-const maxPage = 2; // Nombre total de pages - 1
+const maxPage = 2;
 
-// Méthodes pour changer de page
 const nextPage = () => {
   if (currentPage.value < maxPage) {
     currentPage.value++;
