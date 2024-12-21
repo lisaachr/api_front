@@ -121,7 +121,9 @@ function deconnexion(): void {
       duration: 10000,
       type: 'success'
     })
+    router.push('/api_front')
   })
+
 }
 
 storeAuthentification.refresh()

@@ -19,7 +19,7 @@ export const storeAuthentification = reactive({
         return reponsehttp.json()
           .then(reponseJSON => {
             this.estConnecte = false
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -42,7 +42,7 @@ export const storeAuthentification = reactive({
           .then(reponseJSON => {
             this.utilisateurConnecte = reponseJSON
             this.estConnecte = true
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -65,7 +65,7 @@ export const storeAuthentification = reactive({
         return reponsehttp.json()
           .then(reponseJSON => {
             this.estConnecte = false
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -124,7 +124,7 @@ export const apiStore = {
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
+            return { success: false, error: reponseJSON.detail }
           })
       }
     })
@@ -156,13 +156,13 @@ export const apiStore = {
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
+            return { success: false, error: reponseJSON.detail }
           })
       }
     })
   },
-  updateUser(ressource: string, data: any): Promise<{ success: boolean, error?: string }> {
-    return fetch(this.apiUrl + ressource + '/' + data.id, {
+  updateUser(ressource: string, data: any): Promise<any> {
+    return fetch(this.apiUrl + ressource , {
       method: "PATCH",
       headers: {
         'Content-Type': 'application/json',
@@ -173,6 +173,7 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(() => {
+            storeAuthentification.utilisateurConnecte = data
             return { success: true };
           });
       } else if (reponsehttp.status === 401) {
@@ -188,7 +189,7 @@ export const apiStore = {
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message };
+            return { success: false, error: reponseJSON.detail };
           });
       }
     });

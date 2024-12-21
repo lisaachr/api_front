@@ -1,182 +1,153 @@
-<template>
-  <form @submit.prevent="updateProfile">
-    <h3>Modification du profil</h3>
-
-    <div class="group">
-      <label>Login</label>
-      <input v-model="currentUser.login" type="text" minlength="4" maxlength="20" required />
-    </div>
-
-    <div class="group">
-      <label>Password</label>
-      <input v-model="currentUser.plainPassword" type="password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,30}$"/>
-    </div>
-
-    <div class="group">
-      <label>Adresse email</label>
-      <input v-model="currentUser.email" type="email" required />
-    </div>
-
-    <div class="group">
-      <label>Nom</label>
-      <input v-model="currentUser.nom" type="text" required />
-    </div>
-
-    <div class="group">
-      <label>Prenom</label>
-      <input v-model="currentUser.prenom" type="text" required />
-    </div>
-
-    <div class="group">
-      <label>Ville</label>
-      <select v-model="currentUser.villeHabitation" @change="updateVilleDetails" required>
-        <option v-for="ville in villes" :key="ville.id" :value="ville.id">
-          {{ ville.nom }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Affichage des détails de la ville dans un sous-carré -->
-    <div v-if="currentUser.villeHabitation" class="city-details">
-      <p><strong>Nom:</strong> {{ villeDetails.nom }}</p>
-      <p><strong>Code Postal:</strong> {{ villeDetails.codePostal }}</p>
-      <p><strong>Département:</strong> {{ villeDetails.departement }}</p>
-      <p><strong>Pays:</strong> {{ villeDetails.pays }}</p>
-    </div>
-
-    <div class="group">
-      <label>Date de naissance</label>
-      <input v-model="currentUser.dateDeNaissance" type="date" required />
-    </div>
-
-    <div>
-      <button type="submit">Mettre à jour le profil</button>
-    </div>
-  </form>
-</template>
-
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
 import { apiStore } from "@/util/apiStore";
 import { useRouter } from "vue-router";
 import { notify } from "@kyvg/vue3-notification";
+import { storeAuthentification } from "@/util/apiStore";
+import { ref } from "vue";
 
 const router = useRouter();
 
-const currentUser = ref({
-  login: "",
+const userModif = ref({
+  login: storeAuthentification.utilisateurConnecte.login,
   plainPassword: "",
-  email: "",
-  nom: "",
-  prenom: "",
-  villeHabitation: null,
-  dateDeNaissance: "",
-});
-
-const villes = ref([]);
-const villeDetails = ref({
-  nom: "",
-  codePostal: "",
-  departement: "",
-  pays: "",
-});
-
-apiStore.getAll("villes").then((response) => {
-  villes.value = response.member.map((ville: any) => ({
-    id: ville.id,
-    nom: ville.nom,
-    codePostal: ville.codePostal,
-    departement: ville.departement,
-    pays: ville.pays,
-  }));
-});
-
-onMounted(() => {
-  apiStore.getById("users", 1).then((response) => {
-    currentUser.value = {
-      login: response.login,
-      plainPassword: "",
-      email: response.email,
-      nom: response.nom,
-      prenom: response.prenom,
-      villeHabitation: response.villeHabitation.id,
-      dateDeNaissance: response.dateDeNaissance,
-    };
-
-    const selectedVille = villes.value.find(ville => ville.id === currentUser.value.villeHabitation);
-    if (selectedVille) {
-      villeDetails.value = {
-        nom: selectedVille.nom,
-        codePostal: selectedVille.codePostal,
-        departement: selectedVille.departement,
-        pays: selectedVille.pays,
-      };
-    }
-  });
+  email: storeAuthentification.utilisateurConnecte.email,
+  nom: storeAuthentification.utilisateurConnecte.nom,
+  prenom: storeAuthentification.utilisateurConnecte.prenom,
+  villeHabitation: storeAuthentification.utilisateurConnecte.villeHabitation,
+  dateDeNaissance: storeAuthentification.utilisateurConnecte.dateDeNaissance,
+  currentPlainPassword: "",
 });
 
 function updateProfile(): void {
-  apiStore.updateUser("users", currentUser.value).then((res) => {
+  if (!userModif.value.currentPlainPassword) {
+    notify({
+      type: "error",
+      title: "Mot de passe actuel requis",
+      text: "Veuillez saisir votre mot de passe actuel pour valider les modifications.",
+      duration: 5000,
+    });
+    return;
+  }
+
+  apiStore.updateUser("users/" + storeAuthentification.utilisateurConnecte.id, userModif.value).then((res) => {
     if (res.success) {
       notify({
         type: "success",
         title: "Profil mis à jour",
         text: "Votre profil a été mis à jour avec succès.",
-        duration: 10000,
+        duration: 5000,
       });
-      router.push({ name: 'api_front' });
-    } else {
+      router.push({ name: "api_front" });
+    }
+    else {
+      // debugger
       notify({
         type: "error",
         title: "Erreur de mise à jour",
-        text: "Une erreur est survenue lors de la mise à jour de votre profil.",
-        duration: 10000,
+        text: res.error,
+        duration: 5000,
       });
     }
   });
 }
-
-function updateVilleDetails(): void {
-  const selectedVille = villes.value.find(ville => ville.id === currentUser.value.villeHabitation);
-  if (selectedVille) {
-    villeDetails.value = {
-      nom: selectedVille.nom,
-      codePostal: selectedVille.codePostal,
-      departement: selectedVille.departement,
-      pays: selectedVille.pays,
-    };
-  }
-}
 </script>
 
-<style scoped>
-.group {
-  margin-bottom: 10px;
-}
+<template>
+  <div class="flex justify-center items-start min-h-screen pt-12">
+    <div class="w-full max-w-4xl p-8 border border-gray-300 rounded-md">
+      <h3 class="text-3xl font-bold text-center text-teal-600 mb-6">Modification du profil</h3>
 
-.city-details {
-  border: 1px solid #ddd;
-  padding: 10px;
-  margin-top: 10px;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-}
+      <form @submit.prevent="updateProfile" class="grid grid-cols-2 gap-6">
+        <div class="group mb-4">
+          <label for="login" class="block text-sm font-medium text-gray-700">Login</label>
+          <input
+            v-model="userModif.login"
+            id="login"
+            type="text"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
 
-.city-details p {
-  margin: 5px 0;
-}
+        <div class="group mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700">Adresse email</label>
+          <input
+            v-model="userModif.email"
+            id="email"
+            type="email"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
 
-button {
-  padding: 10px 20px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
-  border-radius: 5px;
-}
+        <div class="group mb-4">
+          <label for="nom" class="block text-sm font-medium text-gray-700">Nom</label>
+          <input
+            v-model="userModif.nom"
+            id="nom"
+            type="text"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
 
-button:hover {
-  background-color: #45a049;
-}
-</style>
+        <div class="group mb-4">
+          <label for="prenom" class="block text-sm font-medium text-gray-700">Prénom</label>
+          <input
+            v-model="userModif.prenom"
+            id="prenom"
+            type="text"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
+
+        <div class="group mb-4">
+          <label for="ville" class="block text-sm font-medium text-gray-700">Ville</label>
+          <input
+            v-model="userModif.villeHabitation"
+            id="ville"
+            type="text"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
+
+        <div class="group mb-4">
+          <label for="dateDeNaissance" class="block text-sm font-medium text-gray-700">Date de naissance</label>
+          <input
+            v-model="userModif.dateDeNaissance"
+            id="dateDeNaissance"
+            type="date"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
+
+        <div class="group mb-4">
+          <label for="currentPlainPassword" class="block text-sm font-medium text-red-700">Mot de passe actuel (requis)</label>
+          <input
+            v-model="userModif.currentPlainPassword"
+            id="currentPlainPassword"
+            type="password"
+            required
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 text-base"
+          />
+        </div>
+
+        <div class="group mb-4">
+          <label for="plainPassword" class="block text-sm font-medium text-gray-700">Nouveau mot de passe (facultatif)</label>
+          <input
+            v-model="userModif.plainPassword"
+            id="plainPassword"
+            type="password"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
+          />
+        </div>
+
+        <div class="col-span-2">
+          <button
+            type="submit"
+            class="w-full py-3 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 text-xl mt-4"
+          >
+            Mettre à jour le profil
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</template>

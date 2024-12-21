@@ -82,7 +82,7 @@ const router = createRouter({
       component: () => import('@/views/FormulaireInscription.vue')
     },
     {
-      path: '/updateProfil',
+      path: '/updateProfil/',
       name: 'updateProfil',
       component: () => import('@/views/FormulaireModifUser.vue')
     }
