@@ -116,44 +116,33 @@ function inscrireUtilisateur(evenementId: number) {
 
   const userId = storeAuthentification.utilisateurConnecte.id;
 
-  // Récupérer les événements existants de l'utilisateur
   apiStore.getById('users', userId).then(user => {
-    const existingEvents = user.evenementMusicals.map(event => event.id);
+    const events = user.evenementMusicals;
+    const evenementMusicalsToAdd = [
+      events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
+      '/api_rest/public/api/evenement_musicals/' + evenementId
+    ];
 
-    if (!existingEvents.includes(evenementId)) {
-      apiStore.updateUser('users', userId, {
-        evenementMusicals: [...existingEvents.map(id => '/api_rest/public/api/evenement_musicals/' + id), '/api_rest/public/api/evenement_musicals/' + evenementId]
-      })
-        .then(userUpdateResponse => {
-          if (!userUpdateResponse.success) {
-            throw new Error(userUpdateResponse.error || "Erreur lors de la mise à jour de l'utilisateur.");
-          }
-          // Mettre à jour l'événement avec l'utilisateur
-          return apiStore.getById('evenement_musicals', evenementId).then(event => {
-            const existingParticipants = event.participants.map(participant => participant.id);
-            if (!existingParticipants.includes(userId)) {
-              return apiStore.updateEvent('evenement_musicals', evenementId, {
-                participants: [...existingParticipants.map(id => '/api_rest/public/api/users/' + id), '/api_rest/public/api/users/' + userId]
-              });
-            } else {
-              return { success: true };
-            }
-          });
-        })
-        .then(eventUpdateResponse => {
-          if (!eventUpdateResponse.success) {
-            throw new Error(eventUpdateResponse.error || "Erreur lors de la mise à jour de l'événement.");
-          }
-          estInscrit.value = true;
-          notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
-        })
-        .catch(error => {
-          console.error("Erreur :", error);
-          notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+    apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToAdd })
+      .then(() => {
+        return apiStore.getById('evenement_musicals', evenementId).then(event => {
+          const participants = event.participants;
+          const participantsToAdd = [
+            participants.map(participant => '/api_rest/public/api/users/' + participant.id),
+            '/api_rest/public/api/users/' + userId
+          ];
+
+          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participantsToAdd });
         });
-    } else {
-      notify({ type: 'warning', text: 'Vous êtes déjà inscrit à cet événement.' });
-    }
+      })
+      .then(() => {
+        estInscrit.value = true;
+        notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+      })
+      .catch(error => {
+        console.error("Erreur :", error);
+        notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+      });
   });
 }
 
@@ -169,11 +158,11 @@ function desinscrireUtilisateur(evenementId: number) {
     const events = user.evenementMusicals.filter(event => event.id !== evenementId);
     const evenementMusicalsToKeep = events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id);
 
-    console.log(evenementMusicalsToKeep)
     apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToKeep })
       .then(() => {
-        // Supprimer l'utilisateur de la liste des participants de l'événement
         return apiStore.getById('evenement_musicals', evenementId).then(event => {
+          console.log('evenements' + JSON.stringify(event))
+          console.log(evenementId)
           const participants = event.participants.filter(participant => participant.id !== userId);
           const participantsToKeep = participants.map(participant => '/api_rest/public/api/users/' + participant.id);
 
