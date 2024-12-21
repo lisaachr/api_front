@@ -6,7 +6,7 @@ import { apiStore } from "@/util/apiStore.ts";
 const evenementsMusicals = ref([]);
 
 apiStore.getAll("evenement_musicals").then((res) => {
-  evenementsMusicals.value = res["member"].slice(0, 2);
+  evenementsMusicals.value = res["member"].slice(0, 3);
 });
 </script>
 
@@ -27,31 +27,30 @@ apiStore.getAll("evenement_musicals").then((res) => {
 
       <section class="events-list">
         <h2>Événements à venir</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
           <div
             v-for="evenement in evenementsMusicals"
             :key="evenement.id"
-            class="dark:bg-gray-800 rounded-lg p-4"
-          >
-            <BoiteEvenementMusical :evenement="evenement" />
-          </div>
+            class="dark:bg-gray-800 rounded-lg p-6">
+          <BoiteEvenementMusical :evenement="evenement" />
         </div>
-      </section>
+  </div>
+  </section>
 
-      <section class="cta">
-        <h2>Rejoignez-nous dès maintenant</h2>
-        <p>
-          Créez un compte pour accéder à plus d'événements et bénéficier d'une expérience personnalisée.
-        </p>
-        <div class="btn-container">
-          <button class="btn-primary">Créer un compte</button>
-        </div>
-      </section>
-    </main>
+  <section class="cta">
+    <h2>Rejoignez-nous dès maintenant</h2>
+    <p>
+      Créez un compte pour accéder à plus d'événements et bénéficier d'une expérience personnalisée.
+    </p>
+    <div class="btn-container">
+      <button class="btn-primary">Créer un compte</button>
+    </div>
+  </section>
+  </main>
 
-    <footer class="footer">
-      <p>&copy; 2024 MusicEvents. Tous droits réservés.</p>
-    </footer>
+  <footer class="footer">
+    <p>&copy; 2024 MusicEvents. Tous droits réservés.</p>
+  </footer>
   </div>
 </template>
 
@@ -84,7 +83,7 @@ apiStore.getAll("evenement_musicals").then((res) => {
 }
 
 .main-content {
-  max-width: 800px;
+  max-width: 1200px; /* Plus large pour plus de contenu */
   margin: 0 auto;
   padding: 20px;
 }
