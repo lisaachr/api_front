@@ -173,8 +173,10 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
-            if (data.evenementMusicals) {
-              response.evenementMusicals = [...response.evenementMusicals, ...data.evenementMusicals];
+            if (data.evenementMusicals !== undefined) {
+              response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
+                !data.evenementMusicals.includes(event.id.toString())
+              );
             }
             return { success: true, data: response }
           });
@@ -208,9 +210,10 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
-            // Si nous ajoutons des participants, nous devons les ajouter à la liste existante
-            if (data.participants) {
-              response.participants = [...response.participants, ...data.participants];
+            if (data.participants !== undefined) {
+              response.participants = response.participants.filter((user: never) =>
+                !data.participants.includes(user.id.toString())
+              );
             }
             return { success: true, data: response }
           });
@@ -232,5 +235,4 @@ export const apiStore = {
       }
     })
   }
-
 }

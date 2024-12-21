@@ -158,22 +158,37 @@ function inscrireUtilisateur(evenementId: number) {
 }
 
 function desinscrireUtilisateur(evenementId: number) {
+  if (!storeAuthentification.estConnecte) {
+    notify({ type: 'error', text: 'Veuillez vous connecter pour vous désinscrire d\'un évènement.' });
+    return;
+  }
+
   const userId = storeAuthentification.utilisateurConnecte.id;
 
-  apiStore.desinscrireEvenement('evenement_musicals', evenementId, userId)
-    .then(eventUpdateResponse => {
-      if (!eventUpdateResponse.success) {
-        throw new Error(eventUpdateResponse.error || "Erreur lors de la désinscription de l'événement.");
-      }
+  apiStore.getById('users', userId).then(user => {
+    const events = user.evenementMusicals.filter(event => event.id !== evenementId);
+    const evenementMusicalsToKeep = events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id);
 
-      // Mettre à jour l'état d'inscription de l'utilisateur
-      estInscrit.value = false;
-      notify({ type: 'success', text: 'Désinscription réussie de l\'événement !' });
-    })
-    .catch(error => {
-      console.error("Erreur :", error);
-      notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
-    });
+    console.log(evenementMusicalsToKeep)
+    apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToKeep })
+      .then(() => {
+        // Supprimer l'utilisateur de la liste des participants de l'événement
+        return apiStore.getById('evenement_musicals', evenementId).then(event => {
+          const participants = event.participants.filter(participant => participant.id !== userId);
+          const participantsToKeep = participants.map(participant => '/api_rest/public/api/users/' + participant.id);
+
+          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participantsToKeep });
+        });
+      })
+      .then(() => {
+        estInscrit.value = false;
+        notify({ type: 'success', text: 'Désinscription réussie de l\'événement !' });
+      })
+      .catch(error => {
+        console.error("Erreur :", error);
+        notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+      });
+  });
 }
 </script>
 
