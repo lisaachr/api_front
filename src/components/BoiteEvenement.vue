@@ -119,7 +119,7 @@ function inscrireUtilisateur(evenementId: number) {
   apiStore.getById('users', userId).then(user => {
     const events = user.evenementMusicals;
     const evenementMusicalsToAdd = [
-      events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
+        ...events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
       '/api_rest/public/api/evenement_musicals/' + evenementId
     ];
 
@@ -128,7 +128,7 @@ function inscrireUtilisateur(evenementId: number) {
         return apiStore.getById('evenement_musicals', evenementId).then(event => {
           const participants = event.participants;
           const participantsToAdd = [
-            participants.map(participant => '/api_rest/public/api/users/' + participant.id),
+              ...participants.map(participant => '/api_rest/public/api/users/' + participant.id),
             '/api_rest/public/api/users/' + userId
           ];
 
