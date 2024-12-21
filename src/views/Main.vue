@@ -6,8 +6,7 @@ import { apiStore } from "@/util/apiStore.ts";
 const evenementsMusicals = ref([]);
 
 apiStore.getAll("evenement_musicals").then((res) => {
-  console.log(res);
-  evenementsMusicals.value = res["member"].slice(0,2)
+  evenementsMusicals.value = res["member"].slice(0, 2);
 });
 </script>
 
@@ -44,7 +43,9 @@ apiStore.getAll("evenement_musicals").then((res) => {
         <p>
           Créez un compte pour accéder à plus d'événements et bénéficier d'une expérience personnalisée.
         </p>
-        <button class="btn-primary">Créer un compte</button>
+        <div class="btn-container">
+          <button class="btn-primary">Créer un compte</button>
+        </div>
       </section>
     </main>
 
@@ -142,6 +143,12 @@ apiStore.getAll("evenement_musicals").then((res) => {
 
 .events-list .event-item .btn-primary:hover {
   background-color: #0b786d;
+}
+
+.cta .btn-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 .cta .btn-primary {
