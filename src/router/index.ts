@@ -1,23 +1,53 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import API from '@/views/MainView.vue';
+import AllEvents from '@/views/AllEvents.vue';
+import AllScenes from '@/views/AllScenes.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: HomeView,
+      component: API,
+      redirect: { name: 'api_front' },
+      children: []
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue'),
+      path: '/api_front',
+      name: 'api_front',
+      component: API,
+      children: []
     },
-  ],
-})
+    {
+      path: '/:pathMatch(.*)*',
+      redirect: 'api_front'
+    },
+    {
+      path: '/allEvents',
+      name: 'allEvents',
+      component: AllEvents
+    },
+    {
+      path: '/allScenes',
+      name: 'allScenes',
+      component: AllScenes
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/FormulaireConnexion.vue')
+    },
+    {
+      path: '/inscription',
+      name: 'inscription',
+      component: () => import('@/views/FormulaireInscription.vue')
+    },
+    {
+      path: '/updateProfil/',
+      name: 'updateProfil',
+      component: () => import('@/views/FormulaireModifUser.vue')
+    }
+  ]
+});
 
-export default router
+export default router;
