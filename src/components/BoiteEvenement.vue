@@ -71,6 +71,14 @@ defineProps<{
   evenement: EvenementMusical;
 }>();
 
+let currentUser = storeAuthentification.utilisateurConnecte || {
+  login: "",
+    email: "",
+    nom: "",
+    prenom: "",
+    dateDeNaissance: "",
+    id: 0
+}
 const currentPage = ref(0);
 const maxPage = 2;
 
@@ -86,7 +94,6 @@ const prevPage = () => {
   }
 };
 
-// Méthode pour inscrire l'utilisateur à un événement
 function inscrireUtilisateur(evenementId: number) {
   console.log("event:",[evenementId])
   if (!storeAuthentification.estConnecte) {
@@ -94,9 +101,8 @@ function inscrireUtilisateur(evenementId: number) {
     return;
   }
 
-  const userId = storeAuthentification.utilisateurConnecte.id;
+  const userId = currentUser.id;
 
-  // Mettre à jour l'utilisateur avec l'événement
   apiStore.updateUser('users', userId, {
     evenementMusicals: ["/api_rest/public/api/evenement_musicals/" + evenementId]
   })
