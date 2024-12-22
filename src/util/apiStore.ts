@@ -55,6 +55,7 @@ export const storeAuthentification = reactive({
     })
   },
   refresh (): Promise<{ success: boolean, error?: string }> {
+
     return fetch(this.apiUrl+'token/refresh',
       {
         method: "POST",
@@ -70,7 +71,6 @@ export const storeAuthentification = reactive({
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            console.log(reponseJSON)
             this.utilisateurConnecte = reponseJSON
             this.estConnecte = true
             return {success: true}
@@ -159,8 +159,8 @@ export const apiStore = {
       }
     })
   },
-  updateUser(ressource: string, data: any): Promise<{success:boolean, error?: string}> {
-    return fetch(this.apiUrl + ressource , {
+  updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
         'Content-Type': 'application/json',
@@ -170,15 +170,19 @@ export const apiStore = {
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
         return reponsehttp.json()
-          .then(() => {
-            storeAuthentification.utilisateurConnecte = data
-            return { success: true };
+          .then(response => {
+            if (response) {
+              response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
+                !data.evenementMusicals.includes(event.id.toString())
+              );
+            }
+            return { success: true, data: response }
           });
-      } else if (reponsehttp.status === 401) {
+      } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateUser(ressource, data);
+              return this.updateUser(ressource, userId, data, false)
             } else {
               return { success: false, error: "unauthorized, failure to refresh token." };
             }
@@ -203,14 +207,19 @@ export const apiStore = {
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
         return reponsehttp.json()
-          .then(() => {
-            return { success: true }
-          })
+          .then(response => {
+            if (response) {
+              response.participants = response.participants.filter((user: never) =>
+                !data.participants.includes(user.id)
+              );
+            }
+            return { success: true, data: response }
+          });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateEvent(eventId, data, false)
+              return this.updateEvent(ressource, eventId, data, false)
             } else {
               return { success: false, error: "unauthorized, failure to refresh token." }
             }
@@ -224,6 +233,4 @@ export const apiStore = {
       }
     })
   }
-
-
 }
