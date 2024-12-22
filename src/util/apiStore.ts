@@ -192,5 +192,38 @@ export const apiStore = {
       }
     });
   },
+  updateEvent(ressource: string, eventId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + ressource + '/' + eventId, {
+      method: "PATCH",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+      credentials: 'include',
+    }).then(reponsehttp => {
+      if (reponsehttp.ok) {
+        return reponsehttp.json()
+          .then(() => {
+            return { success: true }
+          })
+      } else if (reponsehttp.status === 401 && refreshAllowed) {
+        return storeAuthentification.refresh().then(
+          refreshResponse => {
+            if (refreshResponse.success) {
+              return this.updateEvent(eventId, data, false)
+            } else {
+              return { success: false, error: "unauthorized, failure to refresh token." }
+            }
+          }
+        )
+      } else {
+        return reponsehttp.json()
+          .then(reponseJSON => {
+            return { success: false, error: reponseJSON.message }
+          })
+      }
+    })
+  }
+
 
 }

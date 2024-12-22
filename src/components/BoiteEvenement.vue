@@ -43,6 +43,7 @@
           </p>
           <button
             class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg transition-shadow duration-300"
+            @click="inscrireUtilisateur(evenement.id)"
           >
             S'inscrire
           </button>
@@ -63,6 +64,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { EvenementMusical } from "@/types";
+import { apiStore, storeAuthentification} from "@/util/apiStore.ts";
+import {notify} from "@kyvg/vue3-notification";
 
 defineProps<{
   evenement: EvenementMusical;
@@ -82,6 +85,43 @@ const prevPage = () => {
     currentPage.value--;
   }
 };
+
+// Méthode pour inscrire l'utilisateur à un événement
+function inscrireUtilisateur(evenementId: number) {
+  console.log("event:",[evenementId])
+  if (!storeAuthentification.estConnecte) {
+    notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire a un évènement.' });
+    return;
+  }
+
+  const userId = storeAuthentification.utilisateurConnecte.id;
+
+  // Mettre à jour l'utilisateur avec l'événement
+  apiStore.updateUser('users', userId, {
+    evenementMusicals: ["/api_rest/public/api/evenement_musicals/" + evenementId]
+  })
+    .then(userUpdateResponse => {
+      if (!userUpdateResponse.success) {
+        throw new Error(userUpdateResponse.error || "Erreur lors de la mise à jour de l'utilisateur.");
+      }
+
+      // Mettre à jour l'événement avec l'utilisateur
+      return apiStore.updateEvent('evenement_musicals', evenementId, {
+        participants: ["/api_rest/public/api/users/" + userId]
+      });
+    })
+    .then(eventUpdateResponse => {
+      if (!eventUpdateResponse.success) {
+        throw new Error(eventUpdateResponse.error || "Erreur lors de la mise à jour de l'événement.");
+      }
+
+      notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+    })
+    .catch(error => {
+      console.error("Erreur :", error);
+      notify({ type: 'error', text: `Une erreur est survenue : ${error.message}` });
+    });
+}
 </script>
 
 <style scoped>
