@@ -2,8 +2,9 @@
 import { ref } from "vue"
 import BoiteScene from "@/components/BoiteScene.vue"
 import { apiStore } from '@/util/apiStore.ts'
+import type {Scene} from "@/types.ts";
 
-const scenes = ref([])
+const scenes = ref<Scene[]>([])
 
 apiStore.getAll('scenes')
   .then(

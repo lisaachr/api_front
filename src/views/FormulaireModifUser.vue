@@ -7,15 +7,32 @@ import { ref } from "vue";
 
 const router = useRouter();
 
+let currentUser = storeAuthentification.utilisateurConnecte || {
+  login: "",
+  email: "",
+  nom: "",
+  prenom: "",
+  dateDeNaissance: "",
+  id: 0
+}
+
 const userModif = ref({
-  login: storeAuthentification.utilisateurConnecte.login,
+  login: currentUser.login,
   plainPassword: "",
-  email: storeAuthentification.utilisateurConnecte.email,
-  nom: storeAuthentification.utilisateurConnecte.nom,
-  prenom: storeAuthentification.utilisateurConnecte.prenom,
-  villeHabitation: storeAuthentification.utilisateurConnecte.villeHabitation,
-  dateDeNaissance: storeAuthentification.utilisateurConnecte.dateDeNaissance,
+  email: currentUser.email,
+  nom: currentUser.nom,
+  prenom: currentUser.prenom,
+  dateDeNaissance: currentUser.dateDeNaissance,
   currentPlainPassword: "",
+});
+const newUser = ref<{ login: string; plainPassword: string; email: string; nom: string; prenom: string; villeHabitation: string | null; dateDeNaissance: string }>({
+  login: "",
+  plainPassword: "",
+  email: "",
+  nom: "",
+  prenom: "",
+  villeHabitation: null,
+  dateDeNaissance: "",
 });
 
 function updateProfile(): void {
@@ -26,10 +43,8 @@ function updateProfile(): void {
       text: "Veuillez saisir votre mot de passe actuel pour valider les modifications.",
       duration: 5000,
     });
-    return;
   }
-
-  apiStore.updateUser("users/" + storeAuthentification.utilisateurConnecte.id, userModif.value).then((res) => {
+  apiStore.updateUser("users/" + currentUser.id, userModif.value).then((res) => {
     if (res.success) {
       notify({
         type: "success",
@@ -37,10 +52,8 @@ function updateProfile(): void {
         text: "Votre profil a été mis à jour avec succès.",
         duration: 5000,
       });
-      router.push({ name: "api_front" });
-    }
-    else {
-      // debugger
+      router.push('/allEvents')
+    } else {
       notify({
         type: "error",
         title: "Erreur de mise à jour",
@@ -98,39 +111,20 @@ function updateProfile(): void {
           />
         </div>
 
-        <div class="group mb-4">
-          <label for="ville" class="block text-sm font-medium text-gray-700">Ville</label>
-          <input
-            v-model="userModif.villeHabitation"
-            id="ville"
-            type="text"
-            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
-          />
-        </div>
 
         <div class="group mb-4">
-          <label for="dateDeNaissance" class="block text-sm font-medium text-gray-700">Date de naissance</label>
-          <input
-            v-model="userModif.dateDeNaissance"
-            id="dateDeNaissance"
-            type="date"
-            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
-          />
-        </div>
-
-        <div class="group mb-4">
-          <label for="currentPlainPassword" class="block text-sm font-medium text-red-700">Mot de passe actuel (requis)</label>
+          <label for="currentPlainPassword" class="block text-sm font-medium">Mot de passe actuel (requis)</label>
           <input
             v-model="userModif.currentPlainPassword"
             id="currentPlainPassword"
             type="password"
             required
-            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-600 text-base"
+            class="w-full mt-2 p-2 border rounded-md focus:outline-none focus:ring-2 focus:teal-600 text-base"
           />
         </div>
 
         <div class="group mb-4">
-          <label for="plainPassword" class="block text-sm font-medium text-gray-700">Nouveau mot de passe (facultatif)</label>
+          <label for="plainPassword" class="block text-sm font-medium text-gray-700">Confirmer le mot de passe</label>
           <input
             v-model="userModif.plainPassword"
             id="plainPassword"

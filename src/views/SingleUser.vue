@@ -17,10 +17,10 @@ const user = ref<Utilisateur>({
   dateDeNaissance: "Chargement..."
 })
 
-apiStore.getById('users', id)
+apiStore.getById('users', Number(id))
   .then(res => {
     user.value = res
-    console.log(user.value)
+    // console.log(user.value)
   })
 </script>
 

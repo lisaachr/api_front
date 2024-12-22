@@ -2,8 +2,9 @@
 import { ref } from "vue";
 import BoiteUtilisateur from "@/components/BoiteUtilisateur.vue";
 import { apiStore } from '@/util/apiStore.ts';
+import type {Utilisateur} from "@/types.ts";
 
-const users = ref([]);
+const users = ref<Utilisateur[]>([]);
 
 apiStore.getAll('users')
   .then((res) => {

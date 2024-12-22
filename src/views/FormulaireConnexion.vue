@@ -4,9 +4,15 @@ import { storeAuthentification } from "@/util/apiStore";
 import { useRouter } from "vue-router";
 import { notify } from "@kyvg/vue3-notification";
 
+// Définition du type pour les informations de l'utilisateur qui se connecte
+interface ConnectingUser {
+  login: string;
+  plainPassword: string;
+}
+
 const router = useRouter();
 
-const connectingUser = ref({
+const connectingUser = ref<ConnectingUser>({
   login: "",
   plainPassword: ""
 });
@@ -23,11 +29,11 @@ function connect(): void {
         duration: 10000
       });
     } else {
-      router.push('connexion');
+      router.push('login');
       notify({
         type: "error",
         title: "Connexion échouée",
-        text: res.message || "Login et/ou mot de passe incorrects",
+        text: res.error || "Login et/ou mot de passe incorrects",
         duration: 10000
       });
       router.push('login');
@@ -48,6 +54,7 @@ function connect(): void {
             id="login"
             type="text"
             required
+            placeholder="jul135"
             class="w-full mt-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
           />
         </div>
@@ -58,6 +65,7 @@ function connect(): void {
             id="password"
             type="password"
             required
+            placeholder="password"
             class="w-full mt-2 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-600 text-base"
           />
         </div>

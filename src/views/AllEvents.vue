@@ -2,8 +2,9 @@
 import { ref } from "vue";
 import BoiteEvenementMusical from "@/components/BoiteEvenement.vue";
 import { apiStore } from "@/util/apiStore.ts";
+import type {EvenementMusical} from "@/types.ts";
 
-const evenementsMusicals = ref([]);
+const evenementsMusicals = ref<EvenementMusical[]>([]);
 
 apiStore.getAll("evenement_musicals").then((res) => {
   console.log(res);
