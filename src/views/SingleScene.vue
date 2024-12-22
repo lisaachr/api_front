@@ -13,7 +13,7 @@ const scene = ref<Scene>({
   nombreMaxParticipants: 0
 })
 
-apiStore.getById('scenes', id)
+apiStore.getById('scenes', Number(id))
   .then(res => {
     scene.value = res
     console.log(scene.value)
@@ -42,5 +42,3 @@ apiStore.getById('scenes', id)
   </div>
 </template>
 
-<style scoped>
-</style>

@@ -20,8 +20,11 @@
           <div class="md:flex md:items-center md:gap-12">
             <nav aria-label="Global" class="hidden md:block">
               <div class="flex items-center gap-6 text-sm cursor-pointer">
-                <div @click="$router.push({name: 'allEvents'})">Les evenements</div>
+                <div @click="$router.push({name: 'allEvents'})">Les événements</div>
+                <div @click="$router.push({name: 'allScenes'})">Les scènes & Parties de concerts</div>
+
                 <div v-if="storeAuthentification.estConnecte" @click="$router.push({name: 'myEvents'})">Mes evenements</div>
+
               </div>
             </nav>
 
@@ -36,6 +39,12 @@
                   <a
                     class="rounded-md bg-gray-100 px-5 py-2.5 text-sm font-medium text-teal-600 cursor-pointer"
                     v-if="!storeAuthentification.estConnecte" @click="$router.push({name: 'login'})">Se connecter
+                  </a>
+                </div>
+                <div class="hidden sm:flex">
+                  <a
+                    class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow cursor-pointer"
+                    v-if="storeAuthentification.estConnecte" @click="$router.push({name: 'updateProfil'})">Modifier le profil
                   </a>
                 </div>
                 <div class="hidden sm:flex">
@@ -115,7 +124,9 @@ function deconnexion(): void {
       duration: 10000,
       type: 'success'
     })
+    router.push('/api_front')
   })
+
 }
 
 storeAuthentification.refresh()

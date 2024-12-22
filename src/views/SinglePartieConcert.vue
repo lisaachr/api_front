@@ -11,10 +11,20 @@ const partieConcert = ref<PartieConcert>({
   id: Number(route.params.id),
   artistePrincipal: false,
   dateDeDebut: "Chargement...",
-  dateDeFin: "Chargement..."
-})
+  dateDeFin: "Chargement...",
+  artiste: {
+    id: 0,
+    email: "",
+    login: "",
+    nom: "Chargement...",
+    prenom: "",
+    villeHabitation: "",
+    dateDeNaissance: ""
+  },
+  nom: "Chargement...",
+});
 
-apiStore.getById('partie_concerts', id)
+apiStore.getById('partie_concerts', Number(id))
   .then(res => {
     partieConcert.value = res
     console.log(partieConcert.value)
@@ -46,6 +56,3 @@ apiStore.getById('partie_concerts', id)
     </div>
   </div>
 </template>
-
-<style scoped>
-</style>

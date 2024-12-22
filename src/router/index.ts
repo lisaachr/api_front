@@ -1,13 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import API from '@/views/Main.vue'
-import AllUsers from '@/views/AllUsers.vue'
-import AllEvents from '@/views/AllEvents.vue'
-import AllScenes from '@/views/AllScenes.vue'
-import AllPartieConcert from '@/views/AllPartiesConcerts.vue'
-import SingleEvent from '@/views/SingleEvent.vue'
-import SingleUser from '@/views/SingleUser.vue'
-import SinglePartieConcert from '@/views/SinglePartieConcert.vue'
-import SingleScene from '@/views/SingleScene.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import API from '@/views/Main.vue';
+import AllUsers from '@/views/AllUsers.vue';
+import AllEvents from '@/views/AllEvents.vue';
+import AllScenes from '@/views/AllScenes.vue';
+import AllPartieConcert from '@/views/AllPartiesConcerts.vue';
+import SingleEvent from '@/views/SingleEvent.vue';
+import SingleUser from '@/views/SingleUser.vue';
+import SinglePartieConcert from '@/views/SinglePartieConcert.vue';
+import SingleScene from '@/views/SingleScene.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -15,12 +15,14 @@ const router = createRouter({
     {
       path: '/',
       component: API,
-      redirect: { name: 'allEvents' }
+      redirect: { name: 'api_front' },
+      children: []
     },
     {
       path: '/api_front',
       name: 'api_front',
-      component: API
+      component: API,
+      children: []
     },
     {
       path: '/users',
@@ -80,8 +82,13 @@ const router = createRouter({
       path: '/inscription',
       name: 'inscription',
       component: () => import('@/views/FormulaireInscription.vue')
+    },
+    {
+      path: '/updateProfil/',
+      name: 'updateProfil',
+      component: () => import('@/views/FormulaireModifUser.vue')
     }
   ]
-})
+});
 
-export default router
+export default router;

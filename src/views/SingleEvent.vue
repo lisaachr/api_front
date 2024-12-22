@@ -16,10 +16,10 @@ const evenement = ref<EvenementMusical>({
   adresse: "Chargement..."
 })
 
-apiStore.getById('evenement_musicals', id)
+apiStore.getById('evenement_musicals', Number(id))
   .then(res => {
     evenement.value = res
-    console.log(evenement.value)
+    // console.log(evenement.value)
   })
 </script>
 
