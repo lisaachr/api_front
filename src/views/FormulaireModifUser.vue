@@ -25,15 +25,7 @@ const userModif = ref({
   dateDeNaissance: currentUser.dateDeNaissance,
   currentPlainPassword: "",
 });
-const newUser = ref<{ login: string; plainPassword: string; email: string; nom: string; prenom: string; villeHabitation: string | null; dateDeNaissance: string }>({
-  login: "",
-  plainPassword: "",
-  email: "",
-  nom: "",
-  prenom: "",
-  villeHabitation: null,
-  dateDeNaissance: "",
-});
+
 
 function updateProfile(): void {
   if (!userModif.value.currentPlainPassword) {
@@ -52,7 +44,7 @@ function updateProfile(): void {
         text: "Votre profil a été mis à jour avec succès.",
         duration: 5000,
       });
-      router.push('/allEvents')
+      router.push('/');
     } else {
       notify({
         type: "error",
@@ -135,7 +127,7 @@ function updateProfile(): void {
 
         <div class="col-span-2">
           <button
-            type="submit"
+            @click="updateProfile()"
             class="w-full py-3 bg-teal-600 text-white font-semibold rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-600 text-xl mt-4"
           >
             Mettre à jour le profil

@@ -15,7 +15,7 @@ const router = createRouter({
     {
       path: '/',
       component: API,
-      redirect: { name: 'allEvents' },
+      redirect: { name: 'api_front' },
       children: []
     },
     {

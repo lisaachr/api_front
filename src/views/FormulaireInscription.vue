@@ -4,7 +4,6 @@ import { apiStore } from "@/util/apiStore";
 import { useRouter } from "vue-router";
 import { notify } from "@kyvg/vue3-notification";
 
-// Définition du type de l'utilisateur
 interface NewUser {
   login: string;
   plainPassword: string;
@@ -17,7 +16,6 @@ interface NewUser {
 
 const router = useRouter();
 
-// Initialisation de l'utilisateur avec un type explicite
 const newUser = ref<NewUser>({
   login: "",
   plainPassword: "",
@@ -28,7 +26,6 @@ const newUser = ref<NewUser>({
   dateDeNaissance: "",
 });
 
-// Fonction d'inscription
 function register(): void {
   apiStore.createUser("users", newUser.value).then((res) => {
     if (res.success) {
