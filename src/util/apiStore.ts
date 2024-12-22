@@ -176,6 +176,7 @@ export const apiStore = {
         return reponsehttp.json()
           .then(response => {
             if (response) {
+              console.log('Request Headers:', response.headers);
               response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
                 !data.evenementMusicals.includes(event.id.toString())
               );
@@ -213,6 +214,7 @@ export const apiStore = {
         return reponsehttp.json()
           .then(response => {
             if (response) {
+              console.log('Request Headers:', response.headers);
               response.participants = response.participants.filter((user: never) =>
                 !data.participants.includes(user.id)
               );
