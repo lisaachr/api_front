@@ -116,16 +116,12 @@ function inscrireUtilisateur(evenementId: number) {
 
   const userId = storeAuthentification.utilisateurConnecte.id;
 
-  console.log(userId)
   apiStore.getById('users', userId).then(user => {
     const events = user.evenementMusicals || [];
     const evenementMusicalsToAdd = [
         ...events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
       '/api_rest/public/api/evenement_musicals/' + evenementId
     ];
-
-    console.log("events")
-    console.log(evenementMusicalsToAdd)
     apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToAdd })
       .then(() => {
         return apiStore.getById('evenement_musicals', evenementId).then(event => {
@@ -156,8 +152,6 @@ function desinscrireUtilisateur(evenementId: number) {
     const events = user.evenementMusicals.filter(event => event.id !== evenementId);
     const evenementMusicalsToKeep = events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id);
 
-    console.log("events deco ")
-    console.log(evenementMusicalsToKeep)
     apiStore.updateUser('users', Number(userId), { evenementMusicals: evenementMusicalsToKeep })
       .then(() => {
         return apiStore.getById('evenement_musicals', evenementId).then(event => {

@@ -55,6 +55,8 @@ export const storeAuthentification = reactive({
     })
   },
   refresh (): Promise<{ success: boolean, error?: string }> {
+    console.log('bye')
+
     return fetch(this.apiUrl+'token/refresh',
       {
         method: "POST",
@@ -70,7 +72,6 @@ export const storeAuthentification = reactive({
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            console.log(reponseJSON)
             this.utilisateurConnecte = reponseJSON
             this.estConnecte = true
             return {success: true}
@@ -162,6 +163,7 @@ export const apiStore = {
     })
   },
   updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+    console.log('hello')
     return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
@@ -207,7 +209,6 @@ export const apiStore = {
       body: JSON.stringify(data),
       credentials: 'include',
     }).then(reponsehttp => {
-      console.log('Headers envoyés:', reponsehttp.headers);
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
