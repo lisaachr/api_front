@@ -9,7 +9,6 @@ const scenes = ref<Scene[]>([])
 apiStore.getAll('scenes')
   .then(
     (res) => {
-      console.log(res)
       scenes.value = res["member"]
     }
   )

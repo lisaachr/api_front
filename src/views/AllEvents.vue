@@ -7,7 +7,6 @@ import type {EvenementMusical} from "@/types.ts";
 const evenementsMusicals = ref<EvenementMusical[]>([]);
 
 apiStore.getAll("evenement_musicals").then((res) => {
-  console.log(res);
   evenementsMusicals.value = res["member"];
 });
 </script>

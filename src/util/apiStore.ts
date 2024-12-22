@@ -1,101 +1,95 @@
-import { reactive } from 'vue'
+import { reactive } from 'vue';
+import type { Utilisateur } from "@/types.ts";
 
 export const storeAuthentification = reactive({
   apiUrl: "http://localhost/api_rest/public/api/",
   utilisateurConnecte: null,
   estConnecte: false,
-  login (login:string, password:string):Promise<{ success: boolean, error?: string }>{
-    return fetch(this.apiUrl+'auth',
-      {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        credentials: 'include',
-        body: JSON.stringify({login:login, password:password}),
-      }
-    ).then(reponsehttp => {
-      if (!reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            this.estConnecte = false
-            return {success: false, error: reponseJSON.detail}
-          })
-      } else {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            this.utilisateurConnecte = reponseJSON
-            this.estConnecte = true
-            return {success: true}
-          })
-      }
-    })
-  },
-  // les autres méthodes
-  logout(): Promise<{ success: boolean, error?: string }>{
-    return fetch(this.apiUrl+'token/invalidate',{
+
+  login(login: string, password: string): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + 'auth', {
       method: "POST",
-      credentials:'include'
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include',
+      body: JSON.stringify({ login: login, password: password }),
     }).then(reponsehttp => {
       if (!reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            this.utilisateurConnecte = reponseJSON
-            this.estConnecte = true
-            return {success: false, error: reponseJSON.detail}
-          })
+        return reponsehttp.json().then(reponseJSON => {
+          this.estConnecte = false;
+          return { success: false, error: reponseJSON.detail };
+        });
       } else {
-        return reponsehttp.json()
-          .then(() => {
-            this.estConnecte = false
-            this.utilisateurConnecte = null
-            return {success: true}
-          })
+        return reponsehttp.json().then(reponseJSON => {
+          this.utilisateurConnecte = reponseJSON;
+          this.estConnecte = true;
+          return { success: true };
+        });
       }
-    })
+    });
   },
-  refresh (): Promise<{ success: boolean, error?: string }> {
 
-    return fetch(this.apiUrl+'token/refresh',
-      {
-        method: "POST",
-        credentials: 'include',
-      }
-    ).then(reponsehttp => {
+  logout(): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + 'token/invalidate', {
+      method: "POST",
+      credentials: 'include'
+    }).then(reponsehttp => {
       if (!reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            this.estConnecte = false
-            return {success: false, error: reponseJSON.detail}
-          })
+        return reponsehttp.json().then(reponseJSON => {
+          this.utilisateurConnecte = reponseJSON;
+          this.estConnecte = true;
+          return { success: false, error: reponseJSON.detail };
+        });
       } else {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            this.utilisateurConnecte = reponseJSON
-            this.estConnecte = true
-            return {success: true}
-          })
+        return reponsehttp.json().then(() => {
+          this.estConnecte = false;
+          this.utilisateurConnecte = null;
+          return { success: true };
+        });
       }
-    })
-  }
+    });
+  },
 
-})
+  refresh(): Promise<{ success: boolean, error?: string }> {
+    return fetch(this.apiUrl + 'token/refresh', {
+      method: "POST",
+      credentials: 'include',
+    }).then(reponsehttp => {
+      if (!reponsehttp.ok) {
+        return reponsehttp.json().then(reponseJSON => {
+          this.estConnecte = false;
+          return { success: false, error: reponseJSON.detail };
+        });
+      } else {
+        return reponsehttp.json().then(reponseJSON => {
+          this.utilisateurConnecte = reponseJSON;
+          this.estConnecte = true;
+          return { success: true };
+        });
+      }
+    });
+  }
+});
 
 export const apiStore = {
   apiUrl: "http://localhost/api_rest/public/api/",
 
-  getAll(ressource:string):Promise<any>{
-    return fetch(this.apiUrl+ressource)
-      .then(reponsehttp => reponsehttp.json())
+  // Correction : Typage de getAll pour retourner une promesse avec un tableau générique
+  getAll<T>(ressource: string): Promise<T[]> {
+    return fetch(this.apiUrl + ressource)
+      .then(reponsehttp => reponsehttp.json());
   },
-  //à compléter plus tard avec les autres appels à l'API
-  getById(ressource:string, id:number):Promise<any>{
-    return fetch(this.apiUrl+ressource+'/'+id)
-      .then(reponsehttp => reponsehttp.json())
+
+  // Correction : getById avec typage générique T
+  getById<T>(ressource: string, id: number): Promise<T> {
+    return fetch(this.apiUrl + ressource + '/' + id)
+      .then(reponsehttp => reponsehttp.json());
   },
+
   createRessource<T>(
     ressource: string,
-    data: T, // Utilisation du type générique T pour data
+    data: T,
     refreshAllowed = true
   ): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource, {
@@ -127,7 +121,8 @@ export const apiStore = {
       }
     });
   },
-  createUser(ressource: string,data: any,refreshAllowed = true): Promise<{ success: boolean, error?: string }>{
+
+  createUser(ressource: string, data: Utilisateur, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource, {
       method: "POST",
       headers: {
@@ -137,29 +132,28 @@ export const apiStore = {
       credentials: 'include',
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(() => {
-            return { success: true }
-          })
+        return reponsehttp.json().then(() => {
+          return { success: true };
+        });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.createRessource(ressource, data, false)
+              return this.createRessource(ressource, data, false);
             } else {
-              return { success: false, error: "unauthorized, failure to refresh token." }
+              return { success: false, error: "unauthorized, failure to refresh token." };
             }
           }
-        )
+        );
       } else {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            return { success: false, error: reponseJSON.detail }
-          })
+        return reponsehttp.json().then(reponseJSON => {
+          return { success: false, error: reponseJSON.detail };
+        });
       }
-    })
+    });
   },
-  updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+
+  updateUser(ressource: string, userId: number, data: Utilisateur, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
@@ -171,18 +165,15 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
-            if (response) {
-              response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
-                !data.evenementMusicals.includes(event.id.toString())
-              );
-            }
-            return { success: true, data: response }
+            // Si l'objet `Utilisateur` n'a pas `evenementMusicals`, il faut corriger
+            // Suppression de la ligne qui essaie d'accéder à `evenementMusicals`
+            return { success: true, data: response };
           });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateUser(ressource, userId, data, false)
+              return this.updateUser(ressource, userId, data, false);
             } else {
               return { success: false, error: "unauthorized, failure to refresh token." };
             }
@@ -196,7 +187,8 @@ export const apiStore = {
       }
     });
   },
-  updateEvent(ressource: string, eventId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
+
+  updateEvent(ressource: string, eventId: number, data: { participants: { id: number }[] }, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource + '/' + eventId, {
       method: "PATCH",
       headers: {
@@ -209,28 +201,28 @@ export const apiStore = {
         return reponsehttp.json()
           .then(response => {
             if (response) {
-              response.participants = response.participants.filter((user: never) =>
-                !data.participants.includes(user.id)
+              response.participants = response.participants.filter((user: { id: number }) =>
+                !data.participants.some(participant => participant.id === user.id)
               );
             }
-            return { success: true, data: response }
+            return { success: true, data: response };
           });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateEvent(ressource, eventId, data, false)
+              return this.updateEvent(ressource, eventId, data, false);
             } else {
-              return { success: false, error: "unauthorized, failure to refresh token." }
+              return { success: false, error: "unauthorized, failure to refresh token." };
             }
           }
-        )
+        );
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
-          })
+            return { success: false, error: reponseJSON.detail };
+          });
       }
-    })
+    });
   }
-}
+};

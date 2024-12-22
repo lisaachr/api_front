@@ -10,8 +10,9 @@ interface NewUser {
   email: string;
   nom: string;
   prenom: string;
-  villeHabitation: string | null;
   dateDeNaissance: string;
+  id: number;
+  evenementMusicals: [];
 }
 
 const router = useRouter();
@@ -22,8 +23,9 @@ const newUser = ref<NewUser>({
   email: "",
   nom: "",
   prenom: "",
-  villeHabitation: null,
   dateDeNaissance: "",
+  id: 0,
+  evenementMusicals: []
 });
 
 function register(): void {

@@ -22,9 +22,6 @@
               <div class="flex items-center gap-6 text-sm cursor-pointer">
                 <div @click="$router.push({name: 'allEvents'})">Les événements</div>
                 <div @click="$router.push({name: 'allScenes'})">Les scènes & Parties de concerts</div>
-
-                <div v-if="storeAuthentification.estConnecte" @click="$router.push({name: 'myEvents'})">Mes evenements</div>
-
               </div>
             </nav>
 

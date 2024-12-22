@@ -1,13 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import API from '@/views/Main.vue';
-import AllUsers from '@/views/AllUsers.vue';
+import API from '@/views/MainView.vue';
 import AllEvents from '@/views/AllEvents.vue';
 import AllScenes from '@/views/AllScenes.vue';
-import AllPartieConcert from '@/views/AllPartiesConcerts.vue';
-import SingleEvent from '@/views/SingleEvent.vue';
-import SingleUser from '@/views/SingleUser.vue';
-import SinglePartieConcert from '@/views/SinglePartieConcert.vue';
-import SingleScene from '@/views/SingleScene.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,31 +19,6 @@ const router = createRouter({
       children: []
     },
     {
-      path: '/users',
-      name: 'allUsers',
-      component: AllUsers
-    },
-    {
-      path: '/users/:id',
-      name: 'singleUser',
-      component: SingleUser
-    },
-    {
-      path: '/evenement/:id',
-      name: 'singleEvent',
-      component: SingleEvent
-    },
-    {
-      path: '/partieconcert/:id',
-      name: 'singlePartieConcert',
-      component: SinglePartieConcert
-    },
-    {
-      path: '/scene/:id',
-      name: 'singleScene',
-      component: SingleScene
-    },
-    {
       path: '/:pathMatch(.*)*',
       redirect: 'api_front'
     },
@@ -59,19 +28,9 @@ const router = createRouter({
       component: AllEvents
     },
     {
-      path: '/myEvents',
-      name: 'myEvents',
-      component: () => import('@/views/MyEvents.vue')
-    },
-    {
       path: '/allScenes',
       name: 'allScenes',
       component: AllScenes
-    },
-    {
-      path: '/allPartieConcert',
-      name: 'allPartieConcert',
-      component: AllPartieConcert
     },
     {
       path: '/login',

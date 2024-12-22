@@ -10,7 +10,7 @@
       </button>
 
       <div class="h-full flex items-center justify-center px-6">
-        <div v-if="currentPage === 0" class="text-center cursor-pointer" @click="$router.push({name: 'singleEvent', params: {id : evenement.id}})">
+        <div v-if="currentPage === 0" class="text-center cursor-pointer">
           <h2 class="text-2xl font-bold text-teal-600">{{ evenement.nom }}</h2>
           <img
             v-if="evenement.photo"
@@ -42,7 +42,7 @@
             <strong>Prix :</strong> {{ evenement.prix }} €
           </p>
           <button
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded"
             @click="estInscrit ? desinscrireUtilisateur(evenement.id) : inscrireUtilisateur(evenement.id)"
           >
             {{ estInscrit ? 'Se désinscrire' : 'S\'inscrire' }}
@@ -63,23 +63,23 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import type { EvenementMusical } from "@/types";
-import { apiStore, storeAuthentification} from "@/util/apiStore.ts";
-import {notify} from "@kyvg/vue3-notification";
+import {type ApiResponse, type EvenementMusical, type Utilisateur} from "@/types";
+import { apiStore, storeAuthentification } from "@/util/apiStore.ts";
+import { notify } from "@kyvg/vue3-notification";
 
-// Définition des props
 const props = defineProps<{
   evenement: EvenementMusical;
 }>();
 
-let currentUser = storeAuthentification.utilisateurConnecte || {
+const currentUser = storeAuthentification.utilisateurConnecte || {
   login: "",
-    email: "",
-    nom: "",
-    prenom: "",
-    dateDeNaissance: "",
-    id: 0
-}
+  email: "",
+  nom: "",
+  prenom: "",
+  dateDeNaissance: "",
+  id: 0,
+};
+
 const currentPage = ref(0);
 const maxPage = 2;
 
@@ -97,27 +97,38 @@ const prevPage = () => {
 
 const estInscrit = ref(false);
 
-// Dans setup, vérifier si l'utilisateur est déjà inscrit
+// Vérification si l'utilisateur est inscrit lors de la récupération de ses informations
 if (storeAuthentification.estConnecte) {
-  const userId = storeAuthentification.utilisateurConnecte.id;
-  apiStore.getById('users', userId).then(user => {
-    estInscrit.value = user.evenementMusicals.some(event => event.id === props.evenement.id);
+  const userId = currentUser.id;
+
+  apiStore.getById("users", userId).then((response: ApiResponse<Utilisateur>) => {
+    if (response.success && response.data) {
+      const user = response.data;
+      if (user.evenementMusicals) {
+        estInscrit.value = user.evenementMusicals.some(
+          (event: EvenementMusical) => event.id === props.evenement.id
+        );
+      } else {
+        estInscrit.value = false;
+      }
+    } else {
+      console.error("Erreur lors de la récupération de l'utilisateur :", response.error);
+    }
   });
 }
 
-// Méthode pour inscrire l'utilisateur à un événement
 function inscrireUtilisateur(evenementId: number) {
   if (!storeAuthentification.estConnecte) {
     notify({ type: 'error', text: 'Veuillez vous connecter pour vous inscrire à un évènement.' });
     return;
   }
 
-  const userId = storeAuthentification.utilisateurConnecte.id;
+  const userId = currentUser.id;
 
   apiStore.getById('users', userId).then(user => {
     const events = user.evenementMusicals || [];
     const evenementMusicalsToAdd = [
-        ...events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
+      ...events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
       '/api_rest/public/api/evenement_musicals/' + evenementId
     ];
     apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToAdd })

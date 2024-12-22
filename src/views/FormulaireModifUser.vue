@@ -7,14 +7,14 @@ import { ref } from "vue";
 
 const router = useRouter();
 
-let currentUser = storeAuthentification.utilisateurConnecte || {
+const currentUser = storeAuthentification.utilisateurConnecte || {
   login: "",
   email: "",
   nom: "",
   prenom: "",
   dateDeNaissance: "",
-  id: 0
-}
+  id: 0,
+};
 
 const userModif = ref({
   login: currentUser.login,
@@ -24,8 +24,9 @@ const userModif = ref({
   prenom: currentUser.prenom,
   dateDeNaissance: currentUser.dateDeNaissance,
   currentPlainPassword: "",
+  id: currentUser.id,
+  evenementMusicals: []
 });
-
 
 function updateProfile(): void {
   if (!userModif.value.currentPlainPassword) {
@@ -35,27 +36,31 @@ function updateProfile(): void {
       text: "Veuillez saisir votre mot de passe actuel pour valider les modifications.",
       duration: 5000,
     });
+    return;
   }
-  apiStore.updateUser("users/" + currentUser.id, userModif.value).then((res) => {
-    if (res.success) {
-      notify({
-        type: "success",
-        title: "Profil mis à jour",
-        text: "Votre profil a été mis à jour avec succès.",
-        duration: 5000,
-      });
-      router.push('/');
-    } else {
-      notify({
-        type: "error",
-        title: "Erreur de mise à jour",
-        text: res.error,
-        duration: 5000,
-      });
-    }
-  });
+
+  apiStore.updateUser("users", currentUser.id, userModif.value)
+      .then((res) => {
+        if (res.success) {
+          notify({
+            type: "success",
+            title: "Profil mis à jour",
+            text: "Votre profil a été mis à jour avec succès.",
+            duration: 5000,
+          });
+          router.push('/');
+        } else {
+          notify({
+            type: "error",
+            title: "Erreur de mise à jour",
+            text: res.error,
+            duration: 5000,
+          });
+        }
+      })
 }
 </script>
+
 
 <template>
   <div class="flex justify-center items-start min-h-screen pt-12">

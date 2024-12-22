@@ -4,8 +4,8 @@ export interface Utilisateur{
   login: string;
   nom: string;
   prenom: string;
-  villeHabitation: string
-  dateDeNaissance: string
+  dateDeNaissance: string,
+  evenementMusicals: EvenementMusical[]
 }
 
 export interface EvenementMusical {
@@ -17,6 +17,7 @@ export interface EvenementMusical {
   adresse: string;
   photo?: string;
   scenes?: Scene[];
+  participants: { "@id": string }[]
 }
 
 export interface PartieConcert {
@@ -34,3 +35,10 @@ export interface Scene {
   nombreMaxParticipants: number;
   partieConcerts?: PartieConcert[];
 }
+
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
+}
+
