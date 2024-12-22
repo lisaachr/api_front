@@ -15,12 +15,11 @@ apiStore.getAll('scenes')
 </script>
 
 <template>
-  <h1 class="title">Liste des scènes.</h1>
+  <h1 class="text-center text-3xl font-bold text-teal-600 mb-6">
+    Liste des scènes disponibles
+  </h1>
+
   <div v-for="scene in scenes" :key="scene.id">
     <BoiteScene :scene="scene"/>
   </div>
 </template>
-
-<style scoped>
-
-</style>

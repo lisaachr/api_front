@@ -4,21 +4,23 @@ defineProps<{ scene: Scene }>()
 </script>
 
 <template>
-  <div class="content-box">
-    <div class="top">
-      Scene
-    </div>
-    <div class="content">
-      <router-link class="router-link" :to="{ name: 'singleScene', params: { id: scene.id } }">
-        <div class="input-group">
-          <label>Nom de la scène</label>
-          <span> {{ scene.nom }} </span>
-        </div>
-        <div class="input-group">
-          <label>Nombre maximum de participants</label>
-          <span> {{ scene.nombreMaxParticipants }} </span>
-        </div>
-      </router-link>
-    </div>
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6 hover:shadow-lg transition-shadow duration-300 w-[1200px] mx-auto">
+    <div class="text-center text-2xl font-semibold text-teal-600 mb-4">{{ scene.nom }} </div>
+    <router-link
+      class="block p-4 bg-teal-50 hover:bg-teal-100 rounded-lg shadow-md transition-colors duration-300"
+      :to="{ name: 'singleScene', params: { id: scene.id } }"
+    >
+      <div class="mb-4">
+        <label class="block text-lg font-semibold text-gray-700">Nom de la scène :
+          <span class="text-lg text-gray-900">{{ scene.nom }}</span>
+        </label>
+      </div>
+      <div>
+        <label class="block text-lg font-semibold text-gray-700">Nombre maximum de participants :
+          <span class="text-lg text-gray-900">{{ scene.nombreMaxParticipants }}</span>
+        </label>
+
+      </div>
+    </router-link>
   </div>
 </template>

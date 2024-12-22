@@ -20,8 +20,12 @@
           <div class="md:flex md:items-center md:gap-12">
             <nav aria-label="Global" class="hidden md:block">
               <div class="flex items-center gap-6 text-sm cursor-pointer">
-                <div @click="$router.push({name: 'allEvents'})">Les evenements</div>
+                <div @click="$router.push({name: 'allEvents'})">Les événements</div>
+                <div @click="$router.push({name: 'allScenes'})">Les scènes</div>
+                <div @click="$router.push({name: 'allUsers'})">Les artistes</div>
+
                 <div v-if="storeAuthentification.estConnecte" @click="$router.push({name: 'myEvents'})">Mes evenements</div>
+
               </div>
             </nav>
 
