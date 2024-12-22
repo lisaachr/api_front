@@ -1,5 +1,5 @@
 <template>
-  <div id="wrapper">
+  <div id="wrapper" v-if="loaded == true">
     <header class="bg-white sticky top-0 z-50">
       <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
         <div class="flex h-16 items-center justify-between">
@@ -70,11 +70,42 @@
       <Notifications/>
     </main>
   </div>
+  <div v-else class="loading-container">
+    <i class="fa fa-spinner fa-spin"></i> Chargement en cours...
+  </div>
 </template>
 
+<style scoped>
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.5rem;
+  color: #333;
+  background-color: rgba(255, 255, 255, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+.loading-container i {
+  margin-right: 10px;
+  font-size: 2rem;
+  color: #007bff;
+}
+</style>
+
 <script setup lang="ts">
-import {storeAuthentification} from "@/util/apiStore.ts";
-import {Notifications, notify} from "@kyvg/vue3-notification";
+import { storeAuthentification} from "@/util/apiStore"
+import {useRouter} from 'vue-router'
+import {ref} from "vue"
+import {Notifications, notify} from "@kyvg/vue3-notification"
+
+const router = useRouter()
+const loaded = ref(false)
 
 function deconnexion(): void {
   storeAuthentification.logout().then(() => {
@@ -86,5 +117,11 @@ function deconnexion(): void {
     })
   })
 }
+
+storeAuthentification.refresh()
+  .then(() => {
+    loaded.value = true
+    router.push('/connexion')
+  })
 
 </script>

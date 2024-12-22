@@ -116,6 +116,7 @@ function inscrireUtilisateur(evenementId: number) {
 
   const userId = storeAuthentification.utilisateurConnecte.id;
 
+  console.log(userId)
   apiStore.getById('users', userId).then(user => {
     const events = user.evenementMusicals || [];
     const evenementMusicalsToAdd = [
@@ -123,16 +124,12 @@ function inscrireUtilisateur(evenementId: number) {
       '/api_rest/public/api/evenement_musicals/' + evenementId
     ];
 
+    console.log("events")
+    console.log(evenementMusicalsToAdd)
     apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToAdd })
       .then(() => {
         return apiStore.getById('evenement_musicals', evenementId).then(event => {
           const participants = (event.participants || []).map(participant => participant['@id'], '/api_rest/public/api/evenement_musicals/' + userId);
-/*          const participantsToAdd = [
-              ...participants.map(participant => '/api_rest/public/api/users/' + participant['@id']),
-            '/api_rest/public/api/users/' + userId
-          ];
-          console.log("partiticpants avant")*/
-
           return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participants });
         });
       })
@@ -159,15 +156,14 @@ function desinscrireUtilisateur(evenementId: number) {
     const events = user.evenementMusicals.filter(event => event.id !== evenementId);
     const evenementMusicalsToKeep = events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id);
 
-    apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToKeep })
+    console.log("events deco ")
+    console.log(evenementMusicalsToKeep)
+    apiStore.updateUser('users', Number(userId), { evenementMusicals: evenementMusicalsToKeep })
       .then(() => {
         return apiStore.getById('evenement_musicals', evenementId).then(event => {
           const participants = (event.participants || []).filter(participant => participant && participant['@id'] !== undefined && !participant['@id'].endsWith('/' + userId)
           );
           const participantsToKeep = participants.map(participant => participant['@id'] );
-
-          console.log(participantsToKeep)
-
           return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participantsToKeep });
         });
       })
