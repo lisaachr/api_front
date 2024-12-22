@@ -55,7 +55,6 @@ export const storeAuthentification = reactive({
     })
   },
   refresh (): Promise<{ success: boolean, error?: string }> {
-    console.log('bye')
 
     return fetch(this.apiUrl+'token/refresh',
       {
@@ -163,7 +162,6 @@ export const apiStore = {
     })
   },
   updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    console.log('hello')
     return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
@@ -176,7 +174,6 @@ export const apiStore = {
         return reponsehttp.json()
           .then(response => {
             if (response) {
-              console.log('Request Headers:', response.headers);
               response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
                 !data.evenementMusicals.includes(event.id.toString())
               );
@@ -214,7 +211,6 @@ export const apiStore = {
         return reponsehttp.json()
           .then(response => {
             if (response) {
-              console.log('Request Headers:', response.headers);
               response.participants = response.participants.filter((user: never) =>
                 !data.participants.includes(user.id)
               );
