@@ -19,7 +19,7 @@ export const storeAuthentification = reactive({
         return reponsehttp.json()
           .then(reponseJSON => {
             this.estConnecte = false
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -42,7 +42,7 @@ export const storeAuthentification = reactive({
           .then(reponseJSON => {
             this.utilisateurConnecte = reponseJSON
             this.estConnecte = true
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -65,7 +65,7 @@ export const storeAuthentification = reactive({
         return reponsehttp.json()
           .then(reponseJSON => {
             this.estConnecte = false
-            return {success: false, error: reponseJSON.message}
+            return {success: false, error: reponseJSON.detail}
           })
       } else {
         return reponsehttp.json()
@@ -93,9 +93,9 @@ export const apiStore = {
     return fetch(this.apiUrl+ressource+'/'+id)
       .then(reponsehttp => reponsehttp.json())
   },
-  createRessource(
+  createRessource<T>(
     ressource: string,
-    data: never,
+    data: T, // Utilisation du type générique T pour data
     refreshAllowed = true
   ): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource, {
@@ -107,29 +107,27 @@ export const apiStore = {
       credentials: 'include',
     }).then(reponsehttp => {
       if (reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(() => {
-            return { success: true }
-          })
+        return reponsehttp.json().then(() => {
+          return { success: true };
+        });
       } else if (reponsehttp.status === 401 && refreshAllowed) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.createRessource(ressource, data, false)
+              return this.createRessource(ressource, data, false);
             } else {
-              return { success: false, error: "unauthorized, failure to refresh token." }
+              return { success: false, error: "unauthorized, failure to refresh token." };
             }
           }
-        )
+        );
       } else {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
-          })
+        return reponsehttp.json().then(reponseJSON => {
+          return { success: false, error: reponseJSON.detail };
+        });
       }
-    })
+    });
   },
-  createUser(ressource: string,data: never,refreshAllowed = true): Promise<{ success: boolean, error?: string }>{
+  createUser(ressource: string,data: any,refreshAllowed = true): Promise<{ success: boolean, error?: string }>{
     return fetch(this.apiUrl + ressource, {
       method: "POST",
       headers: {
@@ -156,14 +154,13 @@ export const apiStore = {
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
+            return { success: false, error: reponseJSON.detail }
           })
       }
     })
   },
-  updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    console.log("Sending data:", JSON.stringify(data))
-    return fetch(this.apiUrl + ressource + '/' + userId, {
+  updateUser(ressource: string, data: any): Promise<{success:boolean, error?: string}> {
+    return fetch(this.apiUrl + ressource , {
       method: "PATCH",
       headers: {
         'Content-Type': 'application/json',
@@ -174,25 +171,26 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(() => {
-            return { success: true }
-          })
-      } else if (reponsehttp.status === 401 && refreshAllowed) {
+            storeAuthentification.utilisateurConnecte = data
+            return { success: true };
+          });
+      } else if (reponsehttp.status === 401) {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateUser(userId, data, false)
+              return this.updateUser(ressource, data);
             } else {
-              return { success: false, error: "unauthorized, failure to refresh token." }
+              return { success: false, error: "unauthorized, failure to refresh token." };
             }
           }
-        )
+        );
       } else {
         return reponsehttp.json()
           .then(reponseJSON => {
-            return { success: false, error: reponseJSON.message }
-          })
+            return { success: false, error: reponseJSON.detail };
+          });
       }
-    })
+    });
   },
   updateEvent(ressource: string, eventId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
     return fetch(this.apiUrl + ressource + '/' + eventId, {
@@ -226,5 +224,6 @@ export const apiStore = {
       }
     })
   }
+
 
 }

@@ -1,40 +1,34 @@
 <template>
   <div class="flex justify-center items-center mt-10">
-    <div class="relative bg-white shadow-lg rounded-lg overflow-hidden w-96 h-80">
-      <!-- Bouton de navigation gauche -->
+    <div class="relative bg-white shadow-xl rounded-2xl overflow-hidden w-96 h-80 hover:shadow-2xl transition-shadow duration-300">
       <button
-        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-1 px-2 rounded disabled:opacity-50"
+        class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition-colors duration-200"
         @click="prevPage"
         :disabled="currentPage === 0"
       >
-        ◀
+        ◁
       </button>
 
-      <!-- Contenu dynamique en fonction de la page -->
       <div class="h-full flex items-center justify-center px-6">
-        <!-- Page principale de présentation -->
         <div v-if="currentPage === 0" class="text-center cursor-pointer" @click="$router.push({name: 'singleEvent', params: {id : evenement.id}})">
-          <h2 class="text-xl font-bold">{{ evenement.nom }}</h2>
+          <h2 class="text-2xl font-bold text-teal-600">{{ evenement.nom }}</h2>
           <img
             v-if="evenement.photo"
             :src="evenement.photo"
             alt="Image de l'événement"
-            class="mt-4 rounded-lg w-full h-40 object-cover"
+            class="mt-4 rounded-lg w-full h-48 object-cover transition-transform transform hover:scale-105"
           />
         </div>
 
-        <!-- Page des artistes participants -->
         <div v-if="currentPage === 1" class="text-center">
-          <h2 class="text-xl font-bold mb-4">Artistes participants</h2>
+          <h2 class="text-xl font-bold text-teal-600 mb-4">Artistes participants</h2>
           <div class="overflow-y-auto scrollbar-hidden h-60 max-h-80">
-            <!-- Parcours des scènes -->
             <ul class="space-y-2">
               <li v-for="scene in evenement.scenes" :key="scene.id" class="space-y-1">
-                <div class="text-lg font-semibold mb-2">Scène {{ scene.id }}</div>
-                <!-- Parcours des parties de concerts dans chaque scène -->
+                <div class="text-lg font-semibold text-teal-600 mb-2">Scène n° {{ scene.id }}</div>
                 <ul>
                   <li v-for="partie in scene.partieConcerts" :key="partie.id" class="text-blue-600 hover:underline">
-                    <p>{{ partie.artiste.nom }}</p>
+                    <p class="no-underline">{{ partie.artiste.nom }}</p>
                   </li>
                 </ul>
               </li>
@@ -42,14 +36,13 @@
           </div>
         </div>
 
-        <!-- Page des prix et inscription -->
         <div v-if="currentPage === 2" class="text-center">
-          <h2 class="text-xl font-bold mb-4">Prix et Inscription</h2>
+          <h2 class="text-xl font-bold text-teal-600 mb-4">Prix et Inscription</h2>
           <p class="text-gray-700 mb-4">
             <strong>Prix :</strong> {{ evenement.prix }} €
           </p>
           <button
-            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+            class="rounded-md bg-teal-600 px-5 py-2.5 text-sm font-medium text-white shadow-md hover:shadow-lg transition-shadow duration-300"
             @click="inscrireUtilisateur(evenement.id)"
           >
             S'inscrire
@@ -57,13 +50,12 @@
         </div>
       </div>
 
-      <!-- Bouton de navigation droite -->
       <button
-        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-1 px-2 rounded disabled:opacity-50"
+        class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-teal-500 hover:bg-teal-600 text-white font-bold py-2 px-4 rounded-full disabled:opacity-50 transition-colors duration-200"
         @click="nextPage"
         :disabled="currentPage === maxPage"
       >
-        ▶
+        ▷
       </button>
     </div>
   </div>
@@ -75,16 +67,21 @@ import type { EvenementMusical } from "@/types";
 import { apiStore, storeAuthentification} from "@/util/apiStore.ts";
 import {notify} from "@kyvg/vue3-notification";
 
-// Définition des props
 defineProps<{
   evenement: EvenementMusical;
 }>();
 
-// Variables réactives pour la gestion des pages
+let currentUser = storeAuthentification.utilisateurConnecte || {
+  login: "",
+    email: "",
+    nom: "",
+    prenom: "",
+    dateDeNaissance: "",
+    id: 0
+}
 const currentPage = ref(0);
-const maxPage = 2; // Nombre total de pages - 1
+const maxPage = 2;
 
-// Méthodes pour changer de page
 const nextPage = () => {
   if (currentPage.value < maxPage) {
     currentPage.value++;
@@ -97,7 +94,6 @@ const prevPage = () => {
   }
 };
 
-// Méthode pour inscrire l'utilisateur à un événement
 function inscrireUtilisateur(evenementId: number) {
   console.log("event:",[evenementId])
   if (!storeAuthentification.estConnecte) {
@@ -105,9 +101,8 @@ function inscrireUtilisateur(evenementId: number) {
     return;
   }
 
-  const userId = storeAuthentification.utilisateurConnecte.id;
+  const userId = currentUser.id;
 
-  // Mettre à jour l'utilisateur avec l'événement
   apiStore.updateUser('users', userId, {
     evenementMusicals: ["/api_rest/public/api/evenement_musicals/" + evenementId]
   })
@@ -136,13 +131,17 @@ function inscrireUtilisateur(evenementId: number) {
 </script>
 
 <style scoped>
-/* Masquer la barre de défilement avec Tailwind CSS */
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;
 }
 
 .scrollbar-hidden {
-  -ms-overflow-style: none; /* Pour Internet Explorer */
-  scrollbar-width: none; /* Pour Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-underline {
+  text-decoration: none !important;
+  color: black;
 }
 </style>

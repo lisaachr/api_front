@@ -15,6 +15,8 @@ export interface EvenementMusical {
   dateDeFin: string;
   prix: number;
   adresse: string;
+  photo?: string;
+  scenes?: Scene[];
 }
 
 export interface PartieConcert {
@@ -22,10 +24,13 @@ export interface PartieConcert {
   artistePrincipal: boolean;
   dateDeDebut: string;
   dateDeFin: string;
+  artiste: Utilisateur;
+  nom: string;
 }
 
 export interface Scene {
   id: number;
   nom: string;
   nombreMaxParticipants: number;
+  partieConcerts?: PartieConcert[];
 }

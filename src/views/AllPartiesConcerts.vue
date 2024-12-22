@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import BoitePartieConcert from "@/components/BoitePartieConcert.vue" // Composant pour afficher les parties de concert
+import BoitePartieConcert from "@/components/BoitePartieConcert.vue"
 import { apiStore } from '@/util/apiStore.ts'
+import type {PartieConcert} from "@/types.ts";
 
-const partieConcert = ref([])
+const partieConcert = ref<PartieConcert[]>([])
 
 apiStore.getAll('partie_concerts')
   .then(
