@@ -184,7 +184,7 @@ export const apiStore = {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateUser(userId, data, false)
+              return this.updateUser(ressource, userId, data, false)
             } else {
               return { success: false, error: "unauthorized, failure to refresh token." }
             }
@@ -222,7 +222,7 @@ export const apiStore = {
         return storeAuthentification.refresh().then(
           refreshResponse => {
             if (refreshResponse.success) {
-              return this.updateEvent(eventId, data, false)
+              return this.updateEvent(ressource, eventId, data, false)
             } else {
               return { success: false, error: "unauthorized, failure to refresh token." }
             }
