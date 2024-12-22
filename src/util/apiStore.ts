@@ -162,7 +162,7 @@ export const apiStore = {
     })
   },
   updateUser(ressource: string, userId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    return fetch(this.apiUrl + 'users/' + userId, {
+    return fetch(this.apiUrl + ressource + '/' + userId, {
       method: "PATCH",
       headers: {
         'Content-Type': 'application/json',
@@ -173,7 +173,7 @@ export const apiStore = {
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
-            if (data.evenementMusicals !== undefined) {
+            if (response) {
               response.evenementMusicals = response.evenementMusicals.filter((event: never) =>
                 !data.evenementMusicals.includes(event.id.toString())
               );
@@ -199,7 +199,7 @@ export const apiStore = {
     })
   },
   updateEvent(ressource: string, eventId: number, data: never, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    return fetch(this.apiUrl + 'evenement_musicals/' + eventId, {
+    return fetch(this.apiUrl + ressource + '/' + eventId, {
       method: "PATCH",
       headers: {
         'Content-Type': 'application/json',
@@ -207,7 +207,7 @@ export const apiStore = {
       body: JSON.stringify(data),
       credentials: 'include',
     }).then(reponsehttp => {
-      console.log(JSON.stringify(data))
+      console.log('Headers envoyés:', reponsehttp.headers);
       if (reponsehttp.ok) {
         return reponsehttp.json()
           .then(response => {
