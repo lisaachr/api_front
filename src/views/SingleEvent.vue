@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import {useRoute} from 'vue-router';
-import {ref, computed} from 'vue';
-import type {EvenementMusical} from "@/types";
-import {apiStore} from "@/util/apiStore";
+import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import type { EvenementMusical } from "@/types";
+import { apiStore } from "@/util/apiStore";
 
 const route = useRoute();
 const id = route.params.id;
@@ -18,14 +18,22 @@ const evenement = ref<EvenementMusical>({
   genreMusical: []
 });
 
-// Récupération des données de l'événement
-apiStore.getById('evenement_musicals', id)
-  .then(res => {
+const isLoading = ref(true); // Variable d'état de chargement
+
+// Fonction pour récupérer les données de l'événement
+const loadEvenement = async () => {
+  try {
+    const res = await apiStore.getById('evenement_musicals', id);
     evenement.value = res;
-  })
-  .catch(err => {
+  } catch (err) {
     console.error('Erreur lors de la récupération de l\'événement', err);
-  });
+  } finally {
+    isLoading.value = false;  // Arrêter le chargement une fois les données récupérées
+  }
+};
+
+// Appeler la fonction pour charger l'événement
+onMounted(loadEvenement);
 
 // Définition des props
 defineProps({
@@ -79,20 +87,30 @@ const genreMusicalPremier = computed(() => {
   return '';
 });
 
-// Source d'image pour l'événement
-const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] != '' ?  genreImageMap[genreMusicalPremier.value] : 'https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg');
+// Calcul de l'image à afficher
+const imageSrc = computed(() => {
+  if (isLoading.value) {
+    return '';  // Pas d'image tant que le chargement est en cours
+  }
+
+  // Si le genre musical est valide, afficher l'image correspondante
+  const genre = genreMusicalPremier.value;
+  if (genre && genreImageMap[genre]) {
+    return genreImageMap[genre];
+  }
+
+  // Si aucun genre valide n'est trouvé, afficher l'image par défaut
+  return 'https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg';
+});
 </script>
 
 <template>
   <div class="flex lg:flex-row flex-col gap-4 bg-surface-0 dark:bg-surface-900">
     <div class="card flex-1 flex items-center justify-center">
-      <div class="card-img">
-        <div class="img"></div>
-      </div>
       <div class="card-title">
         <h1
           class="text-3xl lg:text-5xl font-bold text-surface-900 dark:text-surface-0 mb-4 lg:leading-normal text-center lg:text-left">
-         <span class="text-primary">{{ evenement.nom }}</span>
+          <span class="text-primary">{{ evenement.nom }}</span>
         </h1>
       </div>
       <div class="card-subtitle">
@@ -109,25 +127,16 @@ const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] != '' ?
       <div class="card-footer flex flex-[auto_1_1] space-x-2">
         <div class="card-price"><span>€</span>{{ evenement.prix }}</div>
         <button class="card-btn">
-          S'inscire
+          S'inscrire
         </button>
       </div>
     </div>
     <div class="flex-1 overflow-hidden p-2">
       <img
-        v-if="imageSrc && imageSrc !== ''"
         :src="imageSrc"
         alt="Image de l'événement"
         class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"
       />
-      <!-- Si imageSrc est null ou vide, afficher l'image par défaut -->
-      <img
-        v-else
-        src="https://webinfo.iutmontp.univ-montp2.fr/~trouchex/img/Metal.jpg"
-        alt="Image par défaut de l'événement"
-        class="h-full w-full object-cover lg:[clip-path:polygon(12%_0,100%_0%,100%_100%,0_100%)] max-h-[100vh] max-w-full"
-      />
-
     </div>
   </div>
 </template>
@@ -141,7 +150,7 @@ const imageSrc = computed(() => genreImageMap[genreMusicalPremier.value] != '' ?
   --main-color: #323232;
   --main-focus: #2d8cf0;
   width: 95vw;
-  height: 50vh;
+  height: 20rem;
   background: var(--bg-color);
   border: 2px solid var(--main-color);
   box-shadow: 4px 4px var(--main-color);
