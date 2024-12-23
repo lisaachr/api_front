@@ -187,42 +187,45 @@ export const apiStore = {
       }
     });
   },
-
-  updateEvent(ressource: string, eventId: number, data: { participants: { id: number }[] }, refreshAllowed = true): Promise<{ success: boolean, error?: string }> {
-    return fetch(this.apiUrl + ressource + '/' + eventId, {
+  updateEvent<T>(
+    ressource: string,
+    eventId: number,
+    data: Partial<T>,
+    refreshAllowed = true
+  ): Promise<{ success: boolean; error?: string }> {
+    return fetch(`${this.apiUrl}${ressource}/${eventId}`, {
       method: "PATCH",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
-      credentials: 'include',
-    }).then(reponsehttp => {
-      if (reponsehttp.ok) {
-        return reponsehttp.json()
-          .then(response => {
-            if (response) {
-              response.participants = response.participants.filter((user: { id: number }) =>
-                !data.participants.some(participant => participant.id === user.id)
-              );
-            }
-            return { success: true, data: response };
-          });
-      } else if (reponsehttp.status === 401 && refreshAllowed) {
-        return storeAuthentification.refresh().then(
-          refreshResponse => {
+      credentials: "include",
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json().then((updatedData) => ({
+            success: true,
+            data: updatedData,
+          }));
+        } else if (response.status === 401 && refreshAllowed) {
+          return storeAuthentification.refresh().then((refreshResponse) => {
             if (refreshResponse.success) {
               return this.updateEvent(ressource, eventId, data, false);
             } else {
-              return { success: false, error: "unauthorized, failure to refresh token." };
+              return { success: false, error: "Unauthorized, token refresh failed." };
             }
-          }
-        );
-      } else {
-        return reponsehttp.json()
-          .then(reponseJSON => {
-            return { success: false, error: reponseJSON.detail };
           });
-      }
-    });
+        } else {
+          return response.json().then((errorData) => ({
+            success: false,
+            error: errorData.detail || "Erreur inconnue.",
+          }));
+        }
+      })
+      .catch((error) => ({
+        success: false,
+        error: error.message || "Erreur réseau.",
+      }));
   }
+
 };

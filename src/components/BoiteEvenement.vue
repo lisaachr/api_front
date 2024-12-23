@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import {type ApiResponse, type EvenementMusical, type Utilisateur} from "@/types";
+import { type ApiResponse, type EvenementMusical, type Utilisateur } from "@/types";
 import { apiStore, storeAuthentification } from "@/util/apiStore.ts";
 import { notify } from "@kyvg/vue3-notification";
 
@@ -101,9 +101,10 @@ const estInscrit = ref(false);
 if (storeAuthentification.estConnecte) {
   const userId = currentUser.id;
 
-  apiStore.getById("users", userId).then((response: ApiResponse<Utilisateur>) => {
-    if (response.success && response.data) {
-      const user = response.data;
+  apiStore.getById("users", userId).then((response: unknown) => {
+    const apiResponse = response as ApiResponse<Utilisateur>;
+    if (apiResponse.success && apiResponse.data) {
+      const user = apiResponse.data;
       if (user.evenementMusicals) {
         estInscrit.value = user.evenementMusicals.some(
           (event: EvenementMusical) => event.id === props.evenement.id
@@ -112,7 +113,7 @@ if (storeAuthentification.estConnecte) {
         estInscrit.value = false;
       }
     } else {
-      console.error("Erreur lors de la récupération de l'utilisateur :", response.error);
+      console.error("Erreur lors de la récupération de l'utilisateur :", apiResponse.error);
     }
   });
 }
@@ -125,28 +126,44 @@ function inscrireUtilisateur(evenementId: number) {
 
   const userId = currentUser.id;
 
-  apiStore.getById('users', userId).then(user => {
-    const events = user.evenementMusicals || [];
-    const evenementMusicalsToAdd = [
-      ...events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id),
-      '/api_rest/public/api/evenement_musicals/' + evenementId
-    ];
-    apiStore.updateUser('users', userId, { evenementMusicals: evenementMusicalsToAdd })
-      .then(() => {
-        return apiStore.getById('evenement_musicals', evenementId).then(event => {
-          const participants = (event.participants || []).map(participant => participant['@id'], '/api_rest/public/api/evenement_musicals/' + userId);
-          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participants });
+  // Récupérer les informations complètes de l'utilisateur avant la mise à jour
+  apiStore.getById<Utilisateur>('users', userId)
+    .then((user) => {
+      // Ajouter l'événement à la liste de l'utilisateur
+      const updatedEvents = [
+        ...(user.evenementMusicals || []), // Garder l'objet EvenementMusical, pas l'URL
+        props.evenement, // Ajouter l'événement courant à la liste
+      ];
+
+      // Créer un objet complet de l'utilisateur avec tous ses champs
+      const updatedUser: Utilisateur = {
+        ...user, // L'utilisateur complet
+        evenementMusicals: updatedEvents, // Ajouter les événements mis à jour
+      };
+
+      // Mettre à jour l'utilisateur complet avec les événements mis à jour
+      return apiStore.updateUser('users', userId, updatedUser);
+    })
+    .then(() => {
+      // Mettre à jour la liste des participants de l'événement
+      return apiStore.getById<EvenementMusical>('evenement_musicals', evenementId)
+        .then(event => {
+          const updatedParticipants = [
+            ...(event.participants || []).map(participant => participant['@id']),
+            `/api/users/${userId}`,
+          ];
+
+          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: updatedParticipants });
         });
-      })
-      .then(() => {
-        estInscrit.value = true;
-        notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
-      })
-      .catch(error => {
-        console.error("Erreur :", error);
-        notify({ type: 'error', text: 'Une erreur est survenue : ' + error.message });
-      });
-  });
+    })
+    .then(() => {
+      estInscrit.value = true;
+      notify({ type: 'success', text: 'Inscription réussie à l\'événement !' });
+    })
+    .catch((error) => {
+      console.error('Erreur lors de l\'inscription :', error);
+      notify({ type: 'error', text: 'Une erreur est survenue : ' + error.message });
+    });
 }
 
 function desinscrireUtilisateur(evenementId: number) {
@@ -157,29 +174,42 @@ function desinscrireUtilisateur(evenementId: number) {
 
   const userId = currentUser.id;
 
-  apiStore.getById('users', userId).then(user => {
-    const events = user.evenementMusicals.filter(event => event.id !== evenementId);
-    const evenementMusicalsToKeep = events.map(event => '/api_rest/public/api/evenement_musicals/' + event.id);
+  // Récupérer les informations complètes de l'utilisateur avant la mise à jour
+  apiStore.getById<Utilisateur>('users', userId)
+    .then((user) => {
+      // Filtrer l'événement à supprimer
+      const updatedEvents = (user.evenementMusicals || [])
+        .filter(event => event.id !== evenementId); // Supprimer l'événement par ID
 
-    apiStore.updateUser('users', Number(userId), { evenementMusicals: evenementMusicalsToKeep })
-      .then(() => {
-        return apiStore.getById('evenement_musicals', evenementId).then(event => {
-          const participants = (event.participants || []).filter(participant => participant && participant['@id'] !== undefined && !participant['@id'].endsWith('/' + userId)
-          );
-          const participantsToKeep = participants.map(participant => participant['@id'] );
-          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: participantsToKeep });
+      // Créer un objet complet de l'utilisateur avec tous ses champs
+      const updatedUser: Utilisateur = {
+        ...user, // L'utilisateur complet
+        evenementMusicals: updatedEvents, // Ajouter les événements mis à jour
+      };
+
+      // Mettre à jour l'utilisateur complet avec les événements mis à jour
+      return apiStore.updateUser('users', userId, updatedUser);
+    })
+    .then(() => {
+      // Mettre à jour la liste des participants de l'événement
+      return apiStore.getById<EvenementMusical>('evenement_musicals', evenementId)
+        .then(event => {
+          const updatedParticipants = (event.participants || [])
+            .filter(participant => participant['@id'] !== `/api/users/${userId}`);
+
+          return apiStore.updateEvent('evenement_musicals', evenementId, { participants: updatedParticipants });
         });
-      })
-      .then(() => {
-        estInscrit.value = false;
-        notify({ type: 'success', text: 'Désinscription réussie de l\'événement !' });
-      })
-      .catch(error => {
-        console.error("Erreur :", error);
-        notify({ type: 'error', text: 'Une erreur est survenue : ' + error.message });
-      });
-  });
+    })
+    .then(() => {
+      estInscrit.value = false;
+      notify({ type: 'success', text: 'Désinscription réussie de l\'événement !' });
+    })
+    .catch((error) => {
+      console.error('Erreur lors de la désinscription :', error);
+      notify({ type: 'error', text: 'Une erreur est survenue : ' + error.message });
+    });
 }
+
 </script>
 
 <style scoped>
