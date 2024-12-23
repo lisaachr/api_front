@@ -126,17 +126,23 @@ function inscrireUtilisateur(evenementId: number) {
 
   const userId = currentUser.id;
 
-  // Récupérer les informations de l'utilisateur
+  // Récupérer les informations complètes de l'utilisateur avant la mise à jour
   apiStore.getById<Utilisateur>('users', userId)
     .then((user) => {
       // Ajouter l'événement à la liste de l'utilisateur
       const updatedEvents = [
-        ...(user.evenementMusicals || []).map(event => event), // Garder l'objet EvenementMusical, pas l'URL
+        ...(user.evenementMusicals || []), // Garder l'objet EvenementMusical, pas l'URL
         props.evenement, // Ajouter l'événement courant à la liste
       ];
 
-      // Mettre à jour l'utilisateur
-      return apiStore.updateUser('users', userId, { evenementMusicals: updatedEvents });
+      // Créer un objet complet de l'utilisateur avec tous ses champs
+      const updatedUser: Utilisateur = {
+        ...user, // L'utilisateur complet
+        evenementMusicals: updatedEvents, // Ajouter les événements mis à jour
+      };
+
+      // Mettre à jour l'utilisateur complet avec les événements mis à jour
+      return apiStore.updateUser('users', userId, updatedUser);
     })
     .then(() => {
       // Mettre à jour la liste des participants de l'événement
@@ -168,15 +174,21 @@ function desinscrireUtilisateur(evenementId: number) {
 
   const userId = currentUser.id;
 
-  // Récupérer les informations de l'utilisateur
+  // Récupérer les informations complètes de l'utilisateur avant la mise à jour
   apiStore.getById<Utilisateur>('users', userId)
     .then((user) => {
       // Filtrer l'événement à supprimer
       const updatedEvents = (user.evenementMusicals || [])
         .filter(event => event.id !== evenementId); // Supprimer l'événement par ID
 
-      // Mettre à jour l'utilisateur
-      return apiStore.updateUser('users', userId, { evenementMusicals: updatedEvents });
+      // Créer un objet complet de l'utilisateur avec tous ses champs
+      const updatedUser: Utilisateur = {
+        ...user, // L'utilisateur complet
+        evenementMusicals: updatedEvents, // Ajouter les événements mis à jour
+      };
+
+      // Mettre à jour l'utilisateur complet avec les événements mis à jour
+      return apiStore.updateUser('users', userId, updatedUser);
     })
     .then(() => {
       // Mettre à jour la liste des participants de l'événement
@@ -197,6 +209,7 @@ function desinscrireUtilisateur(evenementId: number) {
       notify({ type: 'error', text: 'Une erreur est survenue : ' + error.message });
     });
 }
+
 </script>
 
 <style scoped>
