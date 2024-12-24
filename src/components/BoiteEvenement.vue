@@ -63,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { type ApiResponse, type EvenementMusical, type Utilisateur } from "@/types";
+import { type EvenementMusical, type Utilisateur } from "@/types";
 import { apiStore, storeAuthentification } from "@/util/apiStore.ts";
 import { notify } from "@kyvg/vue3-notification";
 
@@ -98,25 +98,25 @@ const prevPage = () => {
 const estInscrit = ref(false);
 
 // Vérification si l'utilisateur est inscrit lors de la récupération de ses informations
-if (storeAuthentification.estConnecte) {
-  const userId = currentUser.id;
-
-  apiStore.getById("users", userId).then((response: unknown) => {
-    const apiResponse = response as ApiResponse<Utilisateur>;
-    if (apiResponse.success && apiResponse.data) {
-      const user = apiResponse.data;
-      if (user.evenementMusicals) {
-        estInscrit.value = user.evenementMusicals.some(
-          (event: EvenementMusical) => event.id === props.evenement.id
-        );
-      } else {
-        estInscrit.value = false;
-      }
-    } else {
-      console.error("Erreur lors de la récupération de l'utilisateur :", apiResponse.error);
-    }
-  });
-}
+// if (storeAuthentification.estConnecte) {
+//   const userId = currentUser.id;
+//
+//   apiStore.getById("users", userId).then((response: unknown) => {
+//     const apiResponse = response as ApiResponse<Utilisateur>;
+//     if (apiResponse.success && apiResponse.data) {
+//       const user = apiResponse.data;
+//       if (user.evenementMusicals) {
+//         estInscrit.value = user.evenementMusicals.some(
+//           (event: EvenementMusical) => event.id === props.evenement.id
+//         );
+//       } else {
+//         estInscrit.value = false;
+//       }
+//     } else {
+//       console.error("Erreur lors de la récupération de l'utilisateur :", apiResponse.error);
+//     }
+//   });
+// }
 
 function inscrireUtilisateur(evenementId: number) {
   if (!storeAuthentification.estConnecte) {

@@ -19,5 +19,5 @@ export default defineConfig({
     host: true,
     port: 5173
   },
-  base: "/~trouchex/api_front/dist/", // Base correcte pour votre déploiement
+  base: "/api_front/dist/", // Base correcte pour votre déploiement
 })

@@ -3,21 +3,11 @@ import { ref } from "vue";
 import { apiStore } from "@/util/apiStore";
 import { useRouter } from "vue-router";
 import { notify } from "@kyvg/vue3-notification";
-
-interface NewUser {
-  login: string;
-  plainPassword: string;
-  email: string;
-  nom: string;
-  prenom: string;
-  dateDeNaissance: string;
-  id: number;
-  evenementMusicals: [];
-}
+import type {Utilisateur} from "@/types.ts";
 
 const router = useRouter();
 
-const newUser = ref<NewUser>({
+const newUser = ref<Utilisateur>({
   login: "",
   plainPassword: "",
   email: "",
@@ -25,7 +15,7 @@ const newUser = ref<NewUser>({
   prenom: "",
   dateDeNaissance: "",
   id: 0,
-  evenementMusicals: []
+  // evenementMusicals: []
 });
 
 function register(): void {

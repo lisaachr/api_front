@@ -4,8 +4,9 @@ export interface Utilisateur{
   login: string;
   nom: string;
   prenom: string;
+  plainPassword: string;
   dateDeNaissance: string,
-  evenementMusicals: EvenementMusical[]
+  evenementMusicals?: EvenementMusical[];
 }
 
 export interface EvenementMusical {
