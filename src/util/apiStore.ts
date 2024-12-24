@@ -2,7 +2,7 @@ import { reactive } from 'vue';
 import type { Utilisateur } from "@/types.ts";
 
 export const storeAuthentification = reactive({
-  apiUrl: "http://localhost/api_rest/public/api/",
+  apiUrl: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/api_rest/public/api/",
   utilisateurConnecte: null,
   estConnecte: false,
 
@@ -73,7 +73,7 @@ export const storeAuthentification = reactive({
 });
 
 export const apiStore = {
-  apiUrl: "http://localhost/api_rest/public/api/",
+  apiUrl: "https://webinfo.iutmontp.univ-montp2.fr/~trouchex/api_rest/public/api/",
 
   // Correction : Typage de getAll pour retourner une promesse avec un tableau générique
   getAll<T>(ressource: string): Promise<T[]> {
